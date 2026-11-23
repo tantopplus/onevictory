@@ -1,0 +1,925 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0a3a8c">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="ONE Victory">
+<title>ONE Victory Sales</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* VOICE: calm, field-ready sales tool — numbers first, one action per screen
+   IDEA: the dealer target card a salesman hands across the counter
+   PICTURE: big "need X more" figures, hero rectangles for the 1V measures
+   COLOUR and TYPE: CelcomDigi deep blue + yellow accent on white; Plus Jakarta Sans
+   LAYOUT: top bar, scope chips, card grid; bottom tab bar on phones */
+:root{color-scheme:light dark;
+--blue:#0a3a8c;--blue2:#1557c9;--yel:#ffc20e;--yel2:#fff3c4;
+--bg:light-dark(#f3f6fb,#0b1220);--card:light-dark(#fff,#131c2e);--ink:light-dark(#0f1a2e,#e8edf6);
+--mut:light-dark(#5b6880,#9aa7bd);--line:light-dark(#e2e8f2,#24304a);--soft:light-dark(#eef3fc,#18233a);
+--ok:#12805c;--okb:light-dark(#e3f6ee,#11362b);--bad:#c2381f;--badb:light-dark(#fdeae5,#3a1a14);--warn:#a66a00}
+:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 "Plus Jakarta Sans",system-ui,sans-serif;overflow-x:clip}
+button,input,select{font:inherit;color:inherit}
+input,select{font-size:16px;min-height:44px;padding:8px 12px;border:1px solid var(--line);border-radius:10px;background:var(--card);width:100%}
+input:focus,select:focus,button:focus-visible{outline:3px solid color-mix(in srgb,var(--blue2) 45%,transparent);outline-offset:1px}
+.btn{min-height:44px;padding:0 18px;border-radius:10px;border:0;background:var(--blue);color:#fff;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:8px;justify-content:center;text-decoration:none;white-space:nowrap}
+.btn.y{background:var(--yel);color:#1b1b1b}.btn.g{background:#1f9d55}.btn.o{background:transparent;color:var(--ink);border:1px solid var(--line)}
+.btn.sm{min-height:36px;padding:0 12px;font-size:14px}
+.hide{display:none!important}
+#login{min-height:100vh;display:grid;place-items:center;padding:20px;background:linear-gradient(160deg,var(--blue) 0 55%,var(--bg) 55%)}
+.lcard{width:min(400px,100%);background:var(--card);border-radius:20px;padding:28px;box-shadow:0 20px 50px #0a3a8c33}
+.brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:20px;white-space:nowrap}
+.mark{width:38px;height:38px;border-radius:11px;background:conic-gradient(from 200deg,var(--yel) 0 40%,var(--blue2) 40% 100%);position:relative;flex:none}
+.mark::after{content:"";position:absolute;inset:9px;border-radius:50%;background:var(--card)}
+.lcard h1{font-size:26px;line-height:1.1;margin:18px 0 4px}
+.lcard label,.flab{display:block;font-size:13px;color:var(--mut);margin:14px 0 4px}
+.err{color:var(--bad);font-size:14px;min-height:20px;margin-top:8px}
+.demo{margin-top:16px;font-size:13px;color:var(--mut);background:var(--soft);border-radius:10px;padding:10px 12px}
+header.top{background:var(--blue);color:#fff;padding:14px max(4vw,16px) 18px}
+.toprow{display:flex;align-items:center;gap:12px;justify-content:space-between;max-width:1240px;margin:auto}
+.toprow .brand .mark::after{background:var(--blue)}
+.who{max-width:1240px;margin:12px auto 0;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:end}
+.who h2{margin:0;font-size:clamp(22px,4vw,30px);line-height:1.1}
+.who small{opacity:.8;display:block}
+.asof{background:#ffffff1f;border-radius:999px;padding:6px 12px;font-size:13px;white-space:nowrap}
+.asof b{color:var(--yel)}
+nav.tabs{max-width:1240px;margin:14px auto 0;display:flex;gap:6px;overflow-x:auto}
+nav.tabs button{background:transparent;border:0;color:#cfe0ff;font-weight:700;padding:10px 14px;border-radius:10px;min-height:44px;cursor:pointer;white-space:nowrap}
+nav.tabs button.on{background:#fff;color:var(--blue)}
+nav.tabs .ts{display:none}
+.iconbtn{background:#ffffff1f;border:0;color:#fff;border-radius:10px;min-height:40px;padding:0 12px;cursor:pointer;font-weight:600}
+main{max-width:1240px;margin:auto;padding:18px max(4vw,16px) 90px}
+.banner{background:var(--yel2);color:#3d2f00;border-left:4px solid var(--yel);border-radius:10px;padding:10px 14px;margin-bottom:14px}
+.bar{display:flex;gap:10px;flex-wrap:wrap;align-items:end;margin-bottom:16px}
+.bar>div{flex:1 1 200px}.bar label{font-size:12px;color:var(--mut);display:block;margin-bottom:3px}
+.sec{margin:22px 0 10px;display:flex;align-items:center;gap:10px;justify-content:space-between;flex-wrap:wrap}
+.sec h3{margin:0;font-size:18px}
+.pill{display:inline-block;font-size:12px;font-weight:700;border-radius:999px;padding:3px 10px;background:var(--soft);color:var(--blue2);white-space:nowrap}
+.pill.ok{background:var(--okb);color:var(--ok)}.pill.bad{background:var(--badb);color:var(--bad)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,230px),1fr));gap:12px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px}
+.kpi{cursor:pointer;text-align:left;width:100%;display:block;font:inherit;color:inherit}
+.kpi:hover{border-color:var(--blue2)}
+.kpi .lab{font-size:13px;color:var(--mut);font-weight:600}
+.kpi .val{font-size:32px;font-weight:800;line-height:1.1;margin:4px 0}
+.kpi .val small{font-size:15px;color:var(--mut);font-weight:600}
+.more{font-size:12px;color:var(--blue2);font-weight:700;margin-top:8px}
+.meter{height:8px;background:var(--soft);border-radius:9px;overflow:hidden;margin:8px 0}
+.meter i{display:block;height:100%;background:var(--blue2);border-radius:9px}
+.meter i.ok{background:var(--ok)}.meter i.y{background:var(--yel)}
+.kline{display:flex;justify-content:space-between;font-size:13px;color:var(--mut);gap:8px}
+.kline b{color:var(--ink)}
+.hist{display:flex;gap:6px;margin-top:10px;border-top:1px dashed var(--line);padding-top:8px}
+.hist span{flex:1;font-size:12px;color:var(--mut);text-align:center}.hist span b{display:block;color:var(--ink);font-size:14px}
+.hero{grid-column:1/-1;background:var(--blue);border-color:var(--blue);color:#fff;padding:20px 22px}
+.hero .lab{color:#cfe0ff;font-size:15px}.hero .val{font-size:clamp(44px,8vw,64px)}.hero .val small{color:#cfe0ff;font-size:20px}
+.hero .kline,.hero .hist span{color:#cfe0ff}.hero .kline b,.hero .hist span b{color:#fff}.hero .hist span b{font-size:18px}
+.hero .meter{background:#ffffff2e;height:12px}.hero .meter i{background:var(--yel)}.hero .meter i.ok{background:#4ade80}
+.hero .more{color:var(--yel)}.hero:hover{border-color:var(--yel)}
+.hero .kline{font-size:15px}
+.summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,150px),1fr));gap:12px}
+.summary .card{padding:14px}.summary .v{font-size:26px;font-weight:800}
+.mix{display:flex;height:34px;border-radius:10px;overflow:hidden;margin:10px 0}
+.mix div{display:grid;place-items:center;font-size:12px;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden}
+.mixg{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:6px}
+.mixg>div{background:var(--soft);border-radius:12px;padding:10px 14px}
+table{border-collapse:collapse;width:100%}
+th,td{padding:9px 10px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
+th:first-child,td:first-child{text-align:left}
+th{font-size:12px;color:var(--mut);font-weight:700;background:var(--soft)}
+.scroll{overflow-x:auto}
+.xl{max-height:70vh;overflow:auto;border:1px solid var(--line);border-radius:12px;background:var(--card)}
+.xl table{font-size:13px}.xl th,.xl td{border:1px solid var(--line);padding:7px 9px}
+.xl thead th{position:sticky;top:0;z-index:2}
+.xl td:first-child,.xl th:first-child{position:sticky;left:0;background:var(--card);z-index:1;max-width:240px;overflow:hidden;text-overflow:ellipsis}
+.xl thead th:first-child{z-index:3;background:var(--soft)}
+.xl tbody tr:nth-child(even) td{background:color-mix(in srgb,var(--soft) 60%,var(--card))}
+.xl tbody tr:hover td{background:var(--yel2);color:#1b1b1b;cursor:pointer}
+.xl tfoot td{font-weight:800;background:var(--soft);position:sticky;bottom:0}
+.hit{color:var(--ok);font-weight:800}
+.tierg{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+@media(max-width:700px){.tierg{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.dl{display:flex;flex-direction:column;gap:8px}
+.drow{display:grid;grid-template-columns:minmax(0,1fr) 140px 110px;gap:12px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px;cursor:pointer;text-align:left;width:100%}
+.drow:hover{border-color:var(--blue2)}
+.drow .nm{font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.drow .cd{font-size:12px;color:var(--mut)}
+@media(max-width:600px){.drow{grid-template-columns:minmax(0,1fr) 96px}.drow .pp{display:none}}
+.dhead{background:var(--blue);color:#fff;border-radius:18px;padding:18px;display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap}
+.dhead h3{margin:0;font-size:22px;line-height:1.15}
+.dhead .codes{font-size:13px;opacity:.85;margin-top:6px}
+.unlock{border-radius:16px;padding:18px;display:flex;gap:18px;align-items:center;flex-wrap:wrap}
+.unlock .big{font-size:56px;font-weight:800;line-height:1}
+.unlock .l1{font-size:19px;font-weight:800;line-height:1.25}
+.unlock .l2{font-size:15px;margin-top:4px}
+.unlock .l3{font-size:15px;margin-top:8px;font-weight:600}
+.unlock.ok{background:var(--okb);color:var(--ok)}.unlock.no{background:var(--yel2);color:#4a3600}
+.plan b{font-size:15px}.plan small{font-size:12px;color:var(--mut);margin-left:4px}
+.pnow{background:var(--blue);color:#fff;border-radius:16px;padding:16px 20px;display:flex;gap:24px;flex-wrap:wrap;align-items:baseline}
+.pnow span{font-size:15px;color:#cfe0ff}.pnow b{font-size:clamp(36px,7vw,52px);line-height:1;color:#fff;margin-right:6px}
+.tiers{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,200px),1fr));gap:10px;margin-top:10px}
+.tier{border:2px solid var(--line);border-radius:14px;padding:12px;background:var(--card)}
+.tier.hit{border-color:var(--ok);background:var(--okb)}.tier.next{border-color:var(--yel)}
+.tier .amt{font-size:22px;font-weight:800}
+.tier .need{font-size:14px;margin-top:6px}
+.two{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));gap:14px}
+.modal{position:fixed;inset:0;background:#0008;display:grid;place-items:center;padding:16px;z-index:20}
+.sheet{background:var(--card);border-radius:18px;max-width:560px;width:100%;max-height:92vh;overflow:auto;padding:18px}
+.sheet img{width:100%;border-radius:12px;border:1px solid var(--line)}
+textarea{width:100%;min-height:170px;font:14px/1.45 inherit;padding:10px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--ink)}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.fig{position:relative;min-height:260px}.fig>svg{position:absolute;inset:0;width:100%;height:100%}
+.slots{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,150px),1fr));gap:8px}
+.slot{border:1px dashed var(--line);border-radius:12px;padding:10px;font-size:13px}
+.slot.on{border-style:solid;border-color:var(--ok);background:var(--okb)}
+.slot b{display:block;font-size:15px}
+.log{font-size:13px;background:var(--soft);border-radius:10px;padding:10px;white-space:pre-wrap;max-height:200px;overflow:auto}
+.tinput{width:76px;min-height:36px;padding:4px 6px;text-align:right;font-size:14px}
+.tform{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,230px),1fr));gap:10px}
+.tform label{display:block;background:var(--soft);border-radius:12px;padding:10px 12px;font-weight:600;font-size:14px}
+.tform input{margin-top:6px}
+.tform small{display:block;color:var(--mut);font-weight:500;font-size:12px;margin-top:4px}
+.seg{display:inline-flex;background:var(--soft);border-radius:12px;padding:4px;gap:4px}
+.seg button{border:0;background:transparent;border-radius:9px;min-height:38px;padding:0 14px;font-weight:700;cursor:pointer;color:var(--mut)}
+.seg button.on{background:var(--card);color:var(--blue);box-shadow:0 1px 3px #0002}
+.sugg{display:flex;flex-direction:column;gap:6px;margin-top:8px}
+.logo{height:40px;max-width:180px;object-fit:contain;display:block}
+.lcard .logo{height:56px;max-width:240px}
+.toprow .logo{height:38px;background:#fff;border-radius:8px;padding:3px 6px}
+.hn{display:flex;gap:6px;margin-top:10px}
+.hn span{flex:1;border-radius:10px;padding:6px 8px;text-align:center;font-size:12px;font-weight:700;background:var(--soft);color:var(--mut)}
+.hn span b{display:block;font-size:21px;font-weight:800;color:var(--ink);line-height:1.15}
+.hn .g{background:var(--okb);color:var(--ok)}.hn .g b{color:var(--ok)}.hn .r{background:var(--badb);color:var(--bad)}.hn .r b{color:var(--bad)}.hn .a{background:var(--yel2);color:#6b4d00}.hn .a b{color:#6b4d00}
+.hero .hn span{background:#ffffff1f;color:#cfe0ff}.hero .hn span b{color:#fff;font-size:28px}.hero .hn .g b{color:#4ade80}.hero .hn .r b{color:#ffb4a3}.hero .hn .a b{color:var(--yel)}
+.chk{display:flex;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line);cursor:pointer}.chk input{width:22px;min-height:22px;flex:none}
+.plist .drow{grid-template-columns:minmax(0,1fr) auto}
+.code{font-size:24px;font-weight:800;letter-spacing:.3px}
+.lg{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,230px),1fr));gap:8px;margin-top:8px}
+.lg div{border:1px solid var(--line);border-radius:12px;padding:10px 12px;display:flex;justify-content:space-between;gap:8px;align-items:center;background:var(--card)}
+.lg b{font-size:17px;overflow-wrap:anywhere}.lg small{display:block;color:var(--mut);font-size:12px}
+.va{background:var(--yel2);color:#3d2f00;border-radius:12px;padding:10px 14px;display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap;margin-top:10px}
+.va b{font-size:20px;letter-spacing:.5px}
+.kv{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--line);flex-wrap:wrap}.kv span{flex:0 0 170px;color:var(--mut);font-size:13px}.kv b{flex:1;font-size:18px;overflow-wrap:anywhere}
+.ownc .kv:last-child{border-bottom:0}.ownc .va{margin-top:8px;border-bottom:0}.ownc .va span{color:#6b4d00}
+.ltab td,.ltab th{padding:8px 10px}.role-owner{background:var(--blue);color:#fff}.role-supervisor{background:var(--yel2);color:#6b4d00}.role-sales{background:var(--soft);color:var(--blue2)}
+@media(max-width:600px){.kv span{flex-basis:100%}.ltab td:last-child,.ltab th:last-child{display:none}.ltab td,.ltab th{padding:8px 6px;font-size:14px}}
+.ltab th{text-align:left}
+.sysh{font-size:13px;font-weight:800;color:var(--blue2);margin-top:12px}
+.lcard.hide{display:none}
+#loading{position:fixed;inset:0;background:color-mix(in srgb,var(--bg) 85%,transparent);display:grid;place-items:center;z-index:40}
+#loading>div{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 22px;display:flex;gap:12px;align-items:center}
+.spin{width:20px;height:20px;border-radius:50%;border:3px solid var(--soft);border-top-color:var(--blue2);animation:sp 1s linear infinite}@keyframes sp{to{transform:rotate(1turn)}}
+.toast{position:fixed;left:50%;bottom:84px;transform:translateX(-50%);background:#0f1a2e;color:#fff;padding:10px 16px;border-radius:10px;z-index:30;font-size:14px}
+.note{font-size:12px;color:var(--mut);margin-top:8px}
+@media(max-width:700px){
+ nav.tabs{position:fixed;left:0;right:0;bottom:0;margin:0;background:var(--card);border-top:1px solid var(--line);z-index:10;justify-content:space-around;padding:6px}
+ nav.tabs button{color:var(--mut);font-size:13px;padding:8px 4px;flex:1}
+ nav.tabs .tl{display:none}nav.tabs .ts{display:inline}
+ nav.tabs button.on{background:var(--soft);color:var(--blue)}
+}
+@media(max-width:600px){.grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.kpi{padding:12px}.kpi .val{font-size:24px}.kpi .val small{font-size:13px}.hist span b{font-size:13px}.kline{font-size:12px}.hero .val{font-size:46px}.hero .kline{font-size:14px}}
+@media(prefers-reduced-motion:no-preference){.meter i{transition:width .5s ease}}
+</style>
+</head>
+<body>
+
+<section id="login">
+  <form class="lcard" id="lform">
+    <div class="brandslot"></div>
+    <h1>Open Channel Dashboard</h1>
+    <div style="color:var(--mut);font-size:14px">Performance Tracker • Central Region</div>
+    <label for="lid">User ID</label><input id="lid" autocomplete="username" required>
+    <label for="lpw">Password</label><input id="lpw" type="password" autocomplete="current-password" required>
+    <div class="err" id="lerr"></div>
+    <button class="btn" style="width:100%;margin-top:6px">Log in</button>
+  </form>
+  <form class="lcard hide" id="sform">
+    <div class="brandslot"></div>
+    <h1>First-time setup</h1>
+    <div style="color:var(--mut);font-size:14px">Create the admin login. Enter the setup code you received.</div>
+    <label for="scode">Setup code</label><input id="scode" required autocomplete="off">
+    <label for="sid">Admin user ID</label><input id="sid" required value="admin" autocomplete="username">
+    <label for="sname">Full name</label><input id="sname" required>
+    <label for="semail">Email</label><input id="semail" type="email" required>
+    <label for="spw">Password (min. 6)</label><input id="spw" type="password" required autocomplete="new-password">
+    <div class="err" id="sferr"></div>
+    <button class="btn" style="width:100%;margin-top:6px">Create admin &amp; log in</button>
+  </form>
+</section>
+
+<section id="app" class="hide">
+  <header class="top">
+    <div class="toprow">
+      <div class="brandslot"></div>
+      <div style="display:flex;gap:8px"><button class="iconbtn" id="bpw">Password</button><button class="iconbtn" id="bout">Log out</button></div>
+    </div>
+    <div class="who">
+      <div><small id="greet"></small><h2 id="uname"></h2><small id="umail"></small></div>
+      <span class="asof">Data as of <b id="asof"></b></span>
+    </div>
+    <nav class="tabs" id="tabs"></nav>
+  </header>
+  <main id="main"></main>
+</section>
+<div id="modal"></div>
+<div id="loading" class="hide"><div><span class="spin"></span><b id="loadmsg">Loading…</b></div></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.min.js"></script>
+<script>
+{
+/* ---------- utilities ---------- */
+const LS={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){return false}}};
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fmt=n=>n==null||isNaN(n)?'–':Math.round(n).toLocaleString('en-MY');
+const rm=n=>'RM '+fmt(n);
+const pct=n=>n!=null&&isFinite(n)?Math.round(n*100)+'%':'–';
+const MON=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const mlab=m=>{const[y,mm]=m.split('-');return MON[+mm-1]+' '+y.slice(2)};
+const dlab=d=>{const x=new Date(d+'T00:00:00');return x.getDate()+' '+MON[x.getMonth()]+' '+x.getFullYear()};
+const ymOf=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
+async function hash(s){try{const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode('ov:'+s));return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')}catch(e){return 'p:'+s}}
+function toast(t){const d=document.createElement('div');d.className='toast';d.textContent=t;document.body.append(d);setTimeout(()=>d.remove(),2600)}
+function todayKL(){const p=new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Kuala_Lumpur',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());return p}
+
+/* file saving: artifact downloads capability, else normal browser download */
+let DL=null;(async()=>{try{if(window.claude&&typeof window.claude.use==='function')DL=await window.claude.use('downloads')}catch(e){DL=null}})();
+async function saveFile(name,data){
+  try{
+    if(DL){await DL.save({filename:name,data});toast('Saved '+name);return}
+    const blob=data instanceof Blob?data:new Blob([data]);const u=URL.createObjectURL(blob);const a=document.createElement('a');a.href=u;a.download=name;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),4000);
+  }catch(e){toast(e&&e.code==='declined'?'Save cancelled':'Could not save here: '+(e&&e.code||e))}}
+const canvasBlob=cv=>new Promise(r=>cv.toBlob(r,'image/png'));
+
+/* ---------- defaults ---------- */
+const DEF_RATES={unlock:40,base:{mvp:[6,6],hvp:[13,9],uhvp:[20,15]},ov:{mvp:[15,15],hvp:[23,23],uhvp:[28,28]},
+ tiers:[{rm:400,ga:5,dev:2},{rm:850,ga:10,dev:5},{rm:1800,ga:20,dev:10},{rm:2700,ga:30,dev:15}]};
+const DEF_FEAT={incentive:true,trend:true,share:true,dealerHistory:true,ownerInfo:false};
+let DATA=null,TGT_DEF=null,S=null,USER=null,TAB='perf',VIEW={};
+
+const KPIS={
+ prepaid:[['pre','Total Prepaid GA'],['ms','Msian GA'],['mig','Migrant GA'],['mk','Msian GA (IU>30)'],['mtp1','Msian 1GA TP'],['tp1','Prepaid 1GA TP'],['tp1v','1V Prepaid Dealer TP']],
+ postpaid:[['post','Total Postpaid GA'],['mpost','Migrant Postpaid GA'],['ptp1','Postpaid 1GA TP'],['ptp1v','Postpaid 1V Dealer TP']],
+ device:[['dev','Total Device GA'],['devtp','Device GA TP'],['si','Device Sell In'],['sitp','Device Sell In TP']]};
+const HERO=new Set(['tp1v','ptp1v']);
+const TKEYS=[...KPIS.prepaid,...KPIS.postpaid,...KPIS.device];
+const LABEL=Object.fromEntries([...TKEYS,['lvp','LVP (<RM30)'],['mvp','MVP (RM30–44)'],['hvp','HVP (RM45–54)'],['uhvp','UHVP (≥RM55)'],['t0','Postpaid tier RM 400'],['t1','Postpaid tier RM 850'],['t2','Postpaid tier RM 1,800'],['t3','Postpaid tier RM 2,700']]);
+const PLAN={mvp:['MVP','Hyper 30/35, Power 35'],hvp:['HVP','Power 45'],uhvp:['UHVP','Power+ 55/65']};
+const planHtml=k=>`<span class="plan"><b>${PLAN[k][0]}</b><small>(${PLAN[k][1]})</small></span>`;
+
+/* ---------- server (Supabase) ---------- */
+const SB_URL='https://zbqajfwmlihgncrlmeek.supabase.co',SB_KEY='sb_publishable_YcnMI2OvEzvO1dtijQLHpw_zqj5C5oI',DOMAIN='users.onevictory.app';
+const SB=window.supabase.createClient(SB_URL,SB_KEY,{auth:{persistSession:true,autoRefreshToken:true}});
+const DEF_KEYS=['pre','mig','ms','aw','mk','lvp','mvp','hvp','uhvp','gmvp','ghvp','guhvp','post','mpost','dev','pmj','si'];
+S={users:[],targets:{},rates:JSON.parse(JSON.stringify(DEF_RATES)),features:{...DEF_FEAT},banner:'',cards:null,logo:null};
+DATA={asOf:todayKL(),months:[],keys:DEF_KEYS,dealers:[]};
+const busy=(on,msg)=>{$('#loading').classList.toggle('hide',!on);if(msg)$('#loadmsg').textContent=msg};
+async function fetchAll(q){const out=[];for(let i=0;;i+=1000){const{data,error}=await q().range(i,i+999);if(error)throw error;out.push(...data);if(data.length<1000)break}return out}
+async function chunks(arr,n,fn){for(let i=0;i<arr.length;i+=n)await fn(arr.slice(i,i+n),i)}
+const ok=r=>{if(r.error)throw r.error;return r.data};
+async function loadUsers(){if(USER.role!=='admin')return;const d=ok(await SB.from('app_users').select('*').order('login_id'));S.users=d.map(u=>({uid:u.id,id:u.login_id,name:u.name,email:u.email||'',role:u.role,scope:u.scope}))}
+async function loadAll(){
+  const st=Object.fromEntries((await fetchAll(()=>SB.from('settings').select('key,value'))).map(r=>[r.key,r.value]));
+  S.rates=st.rates||JSON.parse(JSON.stringify(DEF_RATES));S.features=Object.assign({},DEF_FEAT,st.features||{});S.banner=st.banner||'';S.cards=st.cards||null;S.logo=st.logo||null;
+  const keys=st.keys||DEF_KEYS,months=st.months||[],asOf=st.asOf||todayKL();
+  S.targets={};for(const r of await fetchAll(()=>SB.from('targets').select('month,scope_key,data')))(S.targets[r.month]=S.targets[r.month]||{})[r.scope_key]=r.data;
+  const ds=await fetchAll(()=>SB.from('dealers').select('key,n,xd,xc,se,ss,sm,cl,hq').eq('active',true).order('key'));
+  const dm=months.length?await fetchAll(()=>SB.from('dealer_month').select('key,month,v').in('month',months).order('key').order('month')):[];
+  const idx=new Map(ds.map(d=>[d.key,{...d,h:months.map(()=>null)}])),mi=Object.fromEntries(months.map((m,i)=>[m,i]));
+  for(const r of dm){const d=idx.get(r.key);if(d&&mi[r.month]!=null)d.h[mi[r.month]]=r.v}
+  DATA={asOf,months,keys,dealers:[...idx.values()]};
+  const pr=await fetchAll(()=>SB.from('profiles').select('id,n,se,ss,sm,xd,mc,s').order('id'));
+  const om=new Map((await fetchAll(()=>SB.from('profile_owner').select('id,n,ic,brn,tin').order('id'))).map(o=>[o.id,o]));
+  PROF={asOf:st.profAsOf||'',dealers:pr.map(p=>({...p,xd:p.xd||[],ow:om.get(p.id)||null})).sort((a,b)=>a.n.localeCompare(b.n))};
+  await loadUsers()}
+async function saveSetting(k,v){const{error}=await SB.from('settings').upsert({key:k,value:v,updated_at:new Date().toISOString()});if(error){toast('Not saved: '+error.message);return false}return true}
+async function saveTarget(m,key){const{error}=await SB.from('targets').upsert({month:m,scope_key:key,data:(S.targets[m]||{})[key]||{}});if(error)toast('Not saved: '+error.message)}
+async function api(action,body={}){const{data:{session}}=await SB.auth.getSession();const h={'Content-Type':'application/json',apikey:SB_KEY};if(session)h.Authorization='Bearer '+session.access_token;
+  const r=await fetch(SB_URL+'/functions/v1/admin-users',{method:'POST',headers:h,body:JSON.stringify({action,...body})});const j=await r.json().catch(()=>({error:'Server error '+r.status}));if(!r.ok||j.error)throw new Error(j.error||'Server error');return j}
+async function writeMonth(res,m,asOf){
+  const latest=DATA.months[DATA.months.length-1]||'',isNewest=!latest||m>=latest,seen=new Map();
+  for(const x of res.out){const key=x.info.xd||x.info.xc;if(key)seen.set(key,x)}
+  const rows=[...seen.entries()].map(([key,x])=>({key,...x.info,active:true}));
+  if(isNewest){ok(await SB.from('dealers').update({active:false}).neq('key',''));await chunks(rows,500,async c=>ok(await SB.from('dealers').upsert(c)))}
+  else await chunks(rows.map(r=>({...r,active:false})),500,async c=>ok(await SB.from('dealers').upsert(c,{onConflict:'key',ignoreDuplicates:true})));
+  await chunks([...seen.entries()].map(([key,x])=>({key,month:m,v:x.v})),500,async c=>ok(await SB.from('dealer_month').upsert(c)));
+  await saveSetting('keys',DATA.keys);await saveSetting('months',[...new Set([...DATA.months,m])].sort().slice(-13));
+  if(isNewest)await saveSetting('asOf',asOf||m+'-01');
+  await loadAll()}
+async function writeProfiles(list){
+  ok(await SB.from('profiles').delete().neq('id',''));
+  await chunks(list.map(p=>({id:p.id,n:p.n,se:p.se,ss:p.ss,sm:p.sm,xd:p.xd,mc:p.mc,s:p.s})),300,async c=>ok(await SB.from('profiles').insert(c)));
+  await chunks(list.filter(p=>p.ow).map(p=>({id:p.id,n:p.ow.n,ic:p.ow.ic,brn:p.ow.brn,tin:p.ow.tin})),300,async c=>ok(await SB.from('profile_owner').insert(c)));
+  await saveSetting('profAsOf',todayKL());await loadAll()}
+async function importStarter(pack,log){
+  if(pack.kind!=='onevictory-starter')throw new Error('This is not the ONE Victory starter file');
+  const D=pack.data,seen=new Map();for(const d of D.dealers){const key=d.xd||d.xc;if(key)seen.set(key,d)}
+  log('Dealers…');await chunks([...seen.entries()].map(([key,d])=>({key,n:d.n,xd:d.xd,xc:d.xc,se:d.se,ss:d.ss,sm:d.sm,cl:d.cl,hq:d.hq,active:true})),500,async c=>ok(await SB.from('dealers').upsert(c)));
+  const dm=[];for(const[key,d]of seen)d.h.forEach((v,i)=>{if(v)dm.push({key,month:D.months[i],v})});
+  await chunks(dm,500,async(c,i)=>{log(`Monthly numbers ${Math.min(i+500,dm.length)}/${dm.length}…`);ok(await SB.from('dealer_month').upsert(c))});
+  await saveSetting('keys',D.keys);await saveSetting('months',D.months.slice(-13));await saveSetting('asOf',D.asOf);
+  const m=D.months[D.months.length-1],tg=[];for(const[n,v]of Object.entries(pack.targets.se||{}))tg.push({month:m,scope_key:'SE|'+n,data:v.t});for(const[n,v]of Object.entries(pack.targets.ss||{}))tg.push({month:m,scope_key:'SS|'+n,data:v.t});
+  log('Targets…');ok(await SB.from('targets').upsert(tg));
+  if(pack.profiles){log('Dealer profiles…');await writeProfiles(pack.profiles.dealers)}else await loadAll()}
+
+/* ---------- data helpers ---------- */
+function val(d,j,k){const h=d.h[j];if(!h)return 0;return h[DATA.keys.indexOf(k)]||0}
+function has(d,j){return j>=0&&!!d.h[j]}
+function tierIdx(post,dev){let t=-1;S.rates.tiers.forEach((x,i)=>{if(post>=x.ga&&dev>=x.dev)t=i});return t}
+function agg(list,j){
+  const a={n:list.length};for(const k of DATA.keys)a[k]=0;
+  Object.assign(a,{tp1:0,mtp1:0,gtp1:0,tp1v:0,ptp1:0,ptp3:0,ptp1v:0,devtp:0,sitp:0,t0:0,t1:0,t2:0,t3:0});
+  for(const d of list){if(!has(d,j))continue;
+    for(const k of DATA.keys)a[k]+=val(d,j,k);
+    if(val(d,j,'aw')>=1)a.tp1++; if(val(d,j,'mk')>0)a.mtp1++; if(val(d,j,'mig')>=1)a.gtp1++;
+    if(val(d,j,'mk')>=S.rates.unlock)a.tp1v++;
+    const p=val(d,j,'post'),dv=val(d,j,'dev'),t=tierIdx(p,dv);
+    if(p>=1)a.ptp1++; if(p>=3)a.ptp3++; if(t>=0){a.ptp1v++;a['t'+t]++}
+    if(dv>=1)a.devtp++; if(val(d,j,'si')>=1)a.sitp++;}
+  return a}
+/* per-dealer view of every measure: value shown, and hit test for TP measures */
+function dcell(d,j,k){
+  if(!has(d,j))return{v:null,t:'–'};
+  const U=S.rates.unlock,p=val(d,j,'post'),dv=val(d,j,'dev');
+  const hitR={tp1:['aw',x=>x>=1],mtp1:['mk',x=>x>0],gtp1:['mig',x=>x>=1],tp1v:['mk',x=>x>=U],ptp1:['post',x=>x>=1],ptp3:['post',x=>x>=3],devtp:['dev',x=>x>=1],sitp:['si',x=>x>=1]};
+  if(hitR[k]){const v=val(d,j,hitR[k][0]);return{v,t:fmt(v),hit:hitR[k][1](v)}}
+  if(k==='ptp1v'||/^t\d$/.test(k)){const ti=tierIdx(p,dv);const hit=k==='ptp1v'?ti>=0:ti===+k[1];return{v:p,t:`${p} / ${dv}`,hit}}
+  const v=val(d,j,k);return{v,t:fmt(v)}}
+const RULE={tp1:'Prepaid GA ≥1',mtp1:'Msian GA (IU>30) ≥1',gtp1:'Migrant GA ≥1',tp1v:'≥40 Msian GA (IU>30)',ptp1:'Postpaid GA ≥1',ptp3:'Postpaid GA ≥3',devtp:'Device GA ≥1',sitp:'Sell In ≥1',ptp1v:'Postpaid GA / Device GA, hit RM400 tier or above',t0:'Postpaid GA / Device GA, highest tier RM400',t1:'Postpaid GA / Device GA, highest tier RM850',t2:'Postpaid GA / Device GA, highest tier RM1,800',t3:'Postpaid GA / Device GA, highest tier RM2,700'};
+function inScope(scope){
+  if(scope==='ALL')return DATA.dealers;
+  const[t,v]=scope.split('|');
+  return DATA.dealers.filter(d=>t==='SS'?d.ss===v:t==='SE'?d.se===v:d.cl===v)}
+function scopeOptions(){
+  const sc=USER.role==='admin'?'ALL':USER.scope;const base=inScope(sc);const o=[];
+  if(sc==='ALL')o.push(['ALL','All Central Region']);
+  for(const s of [...new Set(base.map(d=>d.ss))].sort()){if(sc==='ALL'||sc.startsWith('SS|'))o.push(['SS|'+s,'SS · '+s]);
+    for(const e of [...new Set(base.filter(d=>d.ss===s).map(d=>d.se))].sort())o.push(['SE|'+e,'   SE · '+e]);}
+  for(const c of [...new Set(base.map(d=>d.cl))].sort())o.push(['CL|'+c,'Cluster · '+c]);
+  return o}
+const scopeName=sc=>sc==='ALL'?'All Central Region':sc.replace('|',' · ');
+function target(scope,m,k){
+  const T=S.targets[m]||{};const t=T[scope];
+  if(t&&t[k]!=null&&t[k]!=='')return +t[k];
+  if(scope.startsWith('SS|')||scope==='ALL'){const ses=[...new Set(inScope(scope).map(d=>d.se))];let s=0,any=false;
+    for(const e of ses){const x=(T['SE|'+e]||{})[k];if(x!=null&&x!==''){s+=+x;any=true}}return any?s:null}
+  if(scope.startsWith('CL|')){const ses=[...new Set(inScope(scope).map(d=>d.se))];if(ses.length===1)return target('SE|'+ses[0],m,k)}
+  return null}
+function mtdInfo(){const d=new Date(DATA.asOf+'T00:00:00');const dim=new Date(d.getFullYear(),d.getMonth()+1,0).getDate();return{day:d.getDate(),dim}}
+const curJ=()=>DATA.months.length-1;
+const isTP=k=>/tp|^t\d$/.test(k);
+
+/* ---------- incentive ---------- */
+function dealerCalc(d,j){
+  const R=S.rates,g={mvp:'gmvp',hvp:'ghvp',uhvp:'guhvp'};
+  const rows=['mvp','hvp','uhvp'].map(k=>{const ms=val(d,j,k),mg=val(d,j,g[k]);return{k,ms,mg,base:ms*R.base[k][0]+mg*R.base[k][1],ov:ms*R.ov[k][0]+mg*R.ov[k][1]}});
+  const tot={ms:0,mg:0,base:0,ov:0};rows.forEach(x=>{for(const q in tot)tot[q]+=x[q]});
+  const need=Math.max(0,R.unlock-tot.ms),post=val(d,j,'post'),dev=val(d,j,'dev');
+  const tiers=R.tiers.map(t=>{const needDev=Math.max(0,t.dev-dev);return{...t,needDev,needGa:Math.max(0,t.ga-post,needDev),hit:post>=t.ga&&dev>=t.dev}});
+  return{rows,tot,need,unlocked:need===0,post,dev,si:val(d,j,'si'),tiers,hitT:tiers.filter(t=>t.hit).pop()||null,next:tiers.find(t=>!t.hit)||null}}
+const needTxt=t=>t.hit?'Achieved':`Need ${t.needGa} GA${t.needDev?` (incl. ${t.needDev} Device)`:''}`;
+
+/* ---------- shell ---------- */
+function greet(){const h=+new Intl.DateTimeFormat('en-GB',{hour:'numeric',hour12:false,timeZone:'Asia/Kuala_Lumpur'}).format(new Date());return h<12?'Good Morning':h<18?'Good Afternoon':'Good Evening'}
+function brand(){const h=S.logo?`<img class="logo" src="${S.logo}" alt="Logo">`:'<div class="brand"><span class="mark"></span>ONE Victory</div>';document.querySelectorAll('.brandslot').forEach(x=>x.innerHTML=h)}
+function renderShell(){
+  brand();
+  $('#greet').textContent=greet()+',';$('#uname').textContent=USER.name;$('#umail').textContent=USER.email+(USER.role==='admin'?' · Admin':'');
+  $('#asof').textContent=dlab(DATA.asOf);
+  const tabs=[['perf','Performance','Perf'],['ov','ONE Victory','1Victory'],...(S.features.trend?[['trend','12-Month Trend','Trend']]:[]),['prof','Dealer Profile','Profile'],...(USER.role==='admin'?[['admin','Admin','Admin']]:[])];
+  $('#tabs').innerHTML=tabs.map(([k,l,sh])=>`<button data-tab="${k}" class="${TAB===k?'on':''}"><span class="tl">${l}</span><span class="ts">${sh}</span></button>`).join('');
+  render()}
+function render(keepScroll){
+  const m=$('#main'),y=window.scrollY;
+  const ban=S.banner?`<div class="banner">${esc(S.banner)}</div>`:'';
+  if(!DATA.months.length&&TAB!=='admin'&&TAB!=='prof'){m.innerHTML=ban+`<div class="card"><b>No sales data yet.</b><div class="note">${USER.role==='admin'?'Go to Admin › Upload data and import the starter file, or upload a performance file.':'Your admin has not uploaded data yet. Please check again later.'}</div></div>`;window.scrollTo({top:0});return}
+  if(TAB==='perf')m.innerHTML=ban+(VIEW.drill?drillView():perfView());
+  else if(TAB==='ov')m.innerHTML=ban+ovView();
+  else if(TAB==='trend')m.innerHTML=ban+trendView();
+  else if(TAB==='prof')m.innerHTML=ban+profView();
+  else if(TAB==='admin')m.innerHTML=adminView();
+  if(TAB==='trend')drawTrend();
+  window.scrollTo({top:keepScroll?y:0})}
+function scopeSel(id,cur){return `<select id="${id}">${scopeOptions().map(([v,l])=>`<option value="${esc(v)}" ${v===cur?'selected':''}>${esc(l)}</option>`).join('')}</select>`}
+function monthSel(id,j){return `<select id="${id}">${DATA.months.map((m,i)=>`<option value="${i}" ${i===j?'selected':''}>${mlab(m)}${i===curJ()?' (MTD)':''}</option>`).reverse().join('')}</select>`}
+const defScope=()=>USER.role==='admin'?'SS|TAN TEIK WEI':USER.scope;
+
+/* ---------- 1) performance ---------- */
+const CARDS=()=>S.cards||(S.cards={off:{},hist:true,fc:true,mix:true,tiers:true});
+const canCustom=()=>USER.role==='admin'||USER.scope.startsWith('SS|');
+function perfView(){
+  const sc=VIEW.ps||(VIEW.ps=defScope()),j=VIEW.pj??(VIEW.pj=curJ()),C=CARDS();
+  const list=inScope(sc),a=agg(list,j),m=DATA.months[j],isCur=j===curJ(),{day,dim}=mtdInfo();
+  const prev=[j-3,j-2,j-1].filter(x=>x>=0).map(x=>({m:DATA.months[x],a:agg(list,x)}));
+  const se=[...new Set(list.map(d=>d.se))],cl=[...new Set(list.map(d=>d.cl))];
+  const hist=k=>C.hist&&prev.length?`<div class="hist">${prev.map(p=>`<span>${mlab(p.m)}<b>${fmt(p.a[k])}</b></span>`).join('')}</div>`:'';
+  const card=(k,l)=>{const v=a[k],t=target(sc,m,k),r=t?v/t:null,proj=C.fc&&isCur&&!isTP(k)?v/day*dim:null,hero=HERO.has(k);
+    const hc=r==null?'':r>=1?'g':r<.5?'r':'a';
+    return `<button class="card kpi ${hero?'hero':''}" data-drill="${k}"><div class="lab">${l}</div><div class="val">${fmt(v)}${t?` <small>/ ${fmt(t)}</small>`:''}</div>
+    ${t?`<div class="meter"><i class="${r>=1?'ok':''}" style="width:${Math.min(100,r*100)}%"></i></div>
+    <div class="hn"><span class="${hc}">Hit<b>${pct(r)}</b></span><span class="${v>=t?'g':''}">${v>=t?'Target<b>Done</b>':`Need<b>${fmt(t-v)}</b>`}</span></div>`:`<div class="kline" style="margin-top:8px"><span>No target set</span></div>`}
+    ${proj!=null?`<div class="kline" style="margin-top:8px"><span>Month-end forecast</span><b>${fmt(proj)}</b></div>`:''}
+    ${hist(k)}<div class="more">View by dealer ›</div></button>`};
+  const sec=g=>KPIS[g].filter(([k])=>!C.off[k]);
+  const block=(g,title,pill)=>{const ks=sec(g);return ks.length?`<div class="sec"><h3>${title}</h3>${pill||''}</div><div class="grid">${ks.map(x=>card(...x)).join('')}</div>`:''};
+  const mixT=a.lvp+a.mvp+a.hvp+a.uhvp||1;
+  const mix=[['lvp','LVP','#8da2c4','<RM30'],['mvp','MVP','#1557c9','RM30–44'],['hvp','HVP','#0a3a8c','RM45–54'],['uhvp','UHVP','#e0a800','≥RM55']];
+  return `<div class="bar"><div><label>Sales force / cluster</label>${scopeSel('ps',sc)}</div><div style="flex:0 1 180px"><label>Month</label>${monthSel('pj',j)}</div>
+    <div style="flex:0 0 auto;display:flex;gap:8px">${canCustom()?'<button class="btn o" id="pcust">Customise cards</button>':''}<button class="btn g" id="pshare">Share to WhatsApp</button></div></div>
+  <div class="summary">
+    <div class="card"><div style="font-size:13px;color:var(--mut)">SE</div><div style="font-weight:700">${se.length===1?esc(se[0]):se.length+' SEs'}</div></div>
+    <div class="card"><div style="font-size:13px;color:var(--mut)">Cluster</div><div style="font-weight:700">${cl.length===1?esc(cl[0]):cl.length+' clusters'}</div></div>
+    <div class="card"><div style="font-size:13px;color:var(--mut)">Dealer base</div><div class="v">${fmt(list.length)}</div></div>
+    <div class="card"><div style="font-size:13px;color:var(--mut)">${isCur?'MTD day':'Month'}</div><div class="v">${isCur?day+' / '+dim:mlab(m)}</div></div>
+  </div>
+  ${block('prepaid','Prepaid',`<span class="pill">${isCur?'MTD':'Closing'} · tap a card for dealer list</span>`)}
+  ${C.mix?`<div class="card" style="margin-top:12px"><div class="kline"><b style="font-size:15px">Prepaid plan mix (Msian)</b><span>HVP+UHVP <b>${pct((a.hvp+a.uhvp)/mixT)}</b> · target 60%</span></div>
+   <div class="mix">${mix.map(([k,l,c])=>`<div style="width:${a[k]/mixT*100}%;background:${c}">${a[k]/mixT>.08?l:''}</div>`).join('')}</div>
+   <div class="mixg">${mix.map(([k,l,c,r])=>`<div data-drill="${k}" style="cursor:pointer"><div class="kline"><span class="pill" style="background:${c};color:#fff">${l}</span><span>${r}</span></div><div style="font-size:26px;font-weight:800;margin-top:4px">${fmt(a[k])} <small style="font-size:14px;color:var(--mut)">${pct(a[k]/mixT)}</small></div></div>`).join('')}</div></div>`:''}
+  ${block('postpaid','Postpaid')}
+  ${C.tiers?`<div class="sec"><h3>Postpaid tiers hit</h3><span class="pill">dealers by highest tier · no target</span></div>
+  <div class="tierg">${S.rates.tiers.map((t,i)=>`<button class="card kpi" data-drill="t${i}"><div class="lab">RM ${fmt(t.rm)}</div><div class="val">${fmt(a['t'+i])}</div><div class="kline"><span>${t.ga} GA · ${t.dev} Device</span></div>${hist('t'+i)}<div class="more">View dealers ›</div></button>`).join('')}</div>`:''}
+  ${block('device','Device')}
+  ${se.length>1?seTable(list,j):''}`}
+function custDialog(){const C=CARDS();
+  const box=(k,l,on)=>`<label class="chk"><input type="checkbox" data-cc="${k}" ${on?'checked':''}><span>${l}</span></label>`;
+  const grp=(g,t)=>`<div class="sysh">${t}</div>${KPIS[g].map(([k,l])=>box('k:'+k,l,!C.off[k])).join('')}`;
+  $('#modal').innerHTML=`<div class="modal"><div class="sheet"><div class="kline" style="margin-bottom:6px"><b style="font-size:17px">Customise Performance cards</b><button class="btn o sm" id="mclose">Done</button></div>
+   <div class="note" style="margin-top:0">Applies to everyone who opens the Performance page.</div>
+   <div class="sysh">Show on every card</div>${box('o:hist','Past 3 months numbers',C.hist)}${box('o:fc','Month-end forecast',C.fc)}
+   ${grp('prepaid','Prepaid cards')}${box('o:mix','Prepaid plan mix (LVP / MVP / HVP / UHVP)',C.mix)}${grp('postpaid','Postpaid cards')}${box('o:tiers','Postpaid tiers hit (RM 400 – RM 2,700)',C.tiers)}${grp('device','Device cards')}</div></div>`}
+function seTable(list,j){
+  const m=DATA.months[j],ses=[...new Set(list.map(d=>d.se))].sort();
+  const cols=[['mk','Msian GA (IU>30)'],['tp1v','1V TP'],['post','Postpaid'],['dev','Device GA'],['si','Sell In']];
+  return `<div class="sec"><h3>By SE</h3><span class="pill">tap a name to open</span></div><div class="card scroll" style="padding:0"><table><thead><tr><th>SE</th><th>Dealers</th>${cols.map(c=>`<th>${c[1]}</th><th>Hit</th>`).join('')}</tr></thead><tbody>
+  ${ses.map(e=>{const l=list.filter(d=>d.se===e),a=agg(l,j);return `<tr><td><a href="#" data-se="${esc(e)}" style="color:var(--blue2);font-weight:700">${esc(e)}</a></td><td>${l.length}</td>${cols.map(([k])=>{const t=target('SE|'+e,m,k),r=t?a[k]/t:null;return `<td>${fmt(a[k])}</td><td><span class="pill ${r==null?'':r>=1?'ok':r<.5?'bad':''}">${pct(r)}</span></td>`}).join('')}</tr>`}).join('')}</tbody></table></div>`}
+
+/* drill-down: excel-like table by dealer */
+function drillData(){
+  const k=VIEW.drill,sc=VIEW.ps,j=VIEW.pj,q=(VIEW.dq||'').toLowerCase();
+  const js=[j-3,j-2,j-1,j].filter(x=>x>=0);
+  let list=inScope(sc);if(q)list=list.filter(d=>(d.n+' '+d.xd+' '+d.xc+' '+d.se).toLowerCase().includes(q));
+  const rows=list.map(d=>({d,c:js.map(x=>dcell(d,x,k))}));
+  rows.sort((a,b)=>(b.c[b.c.length-1].v??-1)-(a.c[a.c.length-1].v??-1)||a.d.n.localeCompare(b.d.n));
+  if(VIEW.dhit)for(let i=rows.length-1;i>=0;i--)if(!rows[i].c[rows[i].c.length-1].hit)rows.splice(i,1);
+  return{k,sc,j,js,rows,label:LABEL[k],rule:RULE[k],hasHit:!!RULE[k]}}
+function drillView(){
+  const D=drillData(),M=D.js.map(x=>mlab(DATA.months[x])+(x===curJ()?' MTD':''));
+  const tot=D.js.map((x,i)=>D.hasHit?D.rows.filter(r=>r.c[i].hit).length:D.rows.reduce((s,r)=>s+(r.c[i].v||0),0));
+  return `<div class="row" style="margin:0 0 12px;justify-content:space-between"><button class="btn o sm" id="drback">← Back to performance</button>
+   <div class="row" style="margin:0"><button class="btn sm" id="drxls">Export Excel</button><button class="btn g sm" id="drimg">Photo / WhatsApp</button></div></div>
+  <div class="sec" style="margin-top:4px"><h3>${esc(D.label)} by dealer</h3><span class="pill">${esc(scopeName(D.sc))}</span></div>
+  ${D.hasHit?`<div class="note" style="margin:-4px 0 10px">Number shown: ${esc(D.rule)}. <span class="hit">✓</span> = counted as hit.</div>`:''}
+  <div class="bar"><div><label>Search dealer, code or SE</label><input id="dq" value="${esc(VIEW.dq||'')}" placeholder="Type to filter"></div>
+   ${D.hasHit?`<div style="flex:0 0 auto"><button class="btn sm ${VIEW.dhit?'':'o'}" id="dhit">${VIEW.dhit?'Showing hit only':'Show hit only'}</button></div>`:''}</div>
+  <div class="xl"><table><thead><tr><th>Dealer</th>${M.map(x=>`<th>${x}</th>`).join('')}<th>xD code</th><th>xC code</th><th>SE</th><th>Cluster</th></tr></thead>
+  <tbody>${D.rows.map(r=>`<tr data-d="${esc(r.d.xd||r.d.xc)}"><td title="${esc(r.d.n)}">${esc(r.d.n)}</td>${r.c.map(c=>`<td>${c.t}${c.hit?' <span class="hit">✓</span>':''}</td>`).join('')}<td>${esc(r.d.xd)}</td><td>${esc(r.d.xc)}</td><td style="text-align:left">${esc(r.d.se)}</td><td style="text-align:left">${esc(r.d.cl)}</td></tr>`).join('')}</tbody>
+  <tfoot><tr><td>${D.rows.length} dealers · ${D.hasHit?'hit':'total'}</td>${tot.map(t=>`<td>${fmt(t)}</td>`).join('')}<td colspan="4"></td></tr></tfoot></table></div>
+  <div class="note">Tap a dealer to open its ONE Victory card.</div>`}
+function drillAoa(){
+  const D=drillData(),M=D.js.map(x=>mlab(DATA.months[x])+(x===curJ()?' MTD':''));
+  const head=['Dealer','xD code','xC code','SE','Cluster',...M.flatMap(m=>D.hasHit?[m,m+' hit']:[m])];
+  const body=D.rows.map(r=>[r.d.n,r.d.xd,r.d.xc,r.d.se,r.d.cl,...r.c.flatMap(c=>D.hasHit?[c.t==='–'?'':(/\//.test(c.t)?c.t:c.v),c.hit?'Y':'']:[c.v??''])]);
+  return{D,M,head,body}}
+
+/* ---------- canvas report renderer (photo for WhatsApp) ---------- */
+function drawReport({kicker,title,sub,head,widths,rows,foot}){
+  const W=1080,P=44,RH=54,F='"Plus Jakarta Sans",Arial,sans-serif';
+  const cv=document.createElement('canvas'),x=cv.getContext('2d');
+  x.font=`800 46px ${F}`;const tl=wrap(x,title,W-2*P);
+  const top=120+tl.length*56+50;const H=top+30+RH+rows.length*RH+90;cv.width=W;cv.height=H;
+  x.fillStyle='#f3f6fb';x.fillRect(0,0,W,H);x.fillStyle='#0a3a8c';x.fillRect(0,0,W,top);x.fillStyle='#ffc20e';x.fillRect(0,top,W,8);
+  x.fillStyle='#ffc20e';x.font=`800 28px ${F}`;x.fillText(kicker,P,70);
+  x.fillStyle='#fff';x.font=`800 46px ${F}`;tl.forEach((l,i)=>x.fillText(l,P,130+i*56));
+  x.fillStyle='#cfe0ff';x.font=`500 26px ${F}`;x.fillText(sub,P,top-34);
+  const tw=W-2*P,cols=widths.map(w=>w*tw),cx=[];let acc=P;cols.forEach(c=>{cx.push(acc);acc+=c});
+  let y=top+30;x.fillStyle='#fff';x.beginPath();x.roundRect(P-12,y,tw+24,RH*(rows.length+1)+12,18);x.fill();
+  const cell=(t,i,yy,font,color,al)=>{x.font=font;x.fillStyle=color;const w=cols[i]-14;let s=String(t??'');while(s.length>1&&x.measureText(s).width>w)s=s.slice(0,-2)+'…';
+    if(al==='l'||i===0){x.textAlign='left';x.fillText(s,cx[i],yy)}else{x.textAlign='right';x.fillText(s,cx[i]+cols[i]-6,yy)}};
+  head.forEach((h,i)=>cell(h,i,y+38,`700 22px ${F}`,'#5b6880'));y+=RH;
+  rows.forEach((r,ri)=>{
+    if(r.sec){x.fillStyle='#eef3fc';x.fillRect(P-12,y+4,tw+24,RH-6);x.textAlign='left';x.fillStyle='#0a3a8c';x.font=`800 26px ${F}`;x.fillText(r.sec,P,y+38);y+=RH;return}
+    if(ri%2){x.fillStyle='#f7f9fd';x.fillRect(P-12,y+2,tw+24,RH-2)}
+    r.cells.forEach((c,i)=>cell(c,i,y+37,`${r.bold||i>0?700:500} 25px ${F}`,r.colors&&r.colors[i]||'#0f1a2e',r.align&&r.align[i]));y+=RH});
+  x.textAlign='left';x.fillStyle='#5b6880';x.font=`500 22px ${F}`;x.fillText(foot,P,H-36);
+  return cv}
+function wrap(x,t,w){const out=[];let line='';for(const word of String(t).split(' ')){const s=line?line+' '+word:word;if(x.measureText(s).width>w&&line){out.push(line);line=word}else line=s}out.push(line);return out.slice(0,3)}
+
+function shareModal({cv,text,file}){
+  const url=cv.toDataURL('image/png');let F=null;cv.toBlob(b=>{F=new File([b],file,{type:'image/png'})},'image/png');
+  const wa=t=>'https://wa.me/?text='+encodeURIComponent(t);
+  $('#modal').innerHTML=`<div class="modal"><div class="sheet"><div class="kline" style="margin-bottom:10px"><b style="font-size:17px">Share to WhatsApp</b><button class="btn o sm" id="mclose">Close</button></div>
+   <img src="${url}" alt="Report picture">
+   <label class="flab">Message (sent with the picture)</label><textarea id="stxt">${esc(text)}</textarea>
+   <div class="row"><a class="btn g" id="sshare" href="${wa(text)}" target="_blank" rel="noopener" style="flex:1">Share to WhatsApp</a><button class="btn o" id="scopy">Copy text</button></div>
+   <div class="note" id="snote">Opens WhatsApp with the picture and message. Choose the dealer or group to send.</div></div></div>`;
+  $('#stxt').oninput=e=>$('#sshare').href=wa(e.target.value);
+  $('#scopy').onclick=async()=>{try{await navigator.clipboard.writeText($('#stxt').value);toast('Message copied')}catch(e){$('#stxt').select();toast('Select and copy the text')}};
+  $('#sshare').onclick=e=>{
+    if(F&&navigator.canShare&&navigator.canShare({files:[F]})){e.preventDefault();
+      navigator.share({files:[F],text:$('#stxt').value}).catch(err=>{if(err&&err.name!=='AbortError')location.href=wa($('#stxt').value)});return}
+    $('#snote').textContent='This browser can only send text to WhatsApp. Long-press the picture above to save it and attach it in the chat. In the installed phone app the picture goes in automatically.'};
+}
+function perfShare(){
+  const sc=VIEW.ps,j=VIEW.pj,m=DATA.months[j],list=inScope(sc),a=agg(list,j),isCur=j===curJ();
+  const head=['Measure','Actual','Target','Hit %','Need'];const rows=[];
+  const add=(k,l)=>{const t=target(sc,m,k),r=t?a[k]/t:null;rows.push({cells:[l,fmt(a[k]),t?fmt(t):'–',pct(r),t?(a[k]>=t?'Done':fmt(t-a[k])):'–'],bold:HERO.has(k),colors:[null,null,null,r==null?'#5b6880':r>=1?'#12805c':r<.5?'#c2381f':'#0f1a2e']})};
+  rows.push({sec:'Prepaid'});KPIS.prepaid.forEach(x=>add(...x));
+  const mt=a.lvp+a.mvp+a.hvp+a.uhvp||1;rows.push({sec:'Prepaid plan mix (Msian)'});
+  ['lvp','mvp','hvp','uhvp'].forEach(k=>rows.push({cells:[LABEL[k],fmt(a[k]),'',pct(a[k]/mt),'']}));
+  rows.push({sec:'Postpaid'});KPIS.postpaid.forEach(x=>add(...x));
+  S.rates.tiers.forEach((t,i)=>rows.push({cells:[`Dealers at RM ${fmt(t.rm)} tier`,fmt(a['t'+i]),'','','']}));
+  rows.push({sec:'Device'});KPIS.device.forEach(x=>add(...x));
+  const asof=isCur?'As of '+dlab(DATA.asOf):mlab(m)+' closing';
+  const cv=drawReport({kicker:'SALES PERFORMANCE',title:scopeName(sc),sub:`${asof}  ·  ${list.length} dealers`,head,widths:[.42,.15,.15,.13,.15],rows,foot:'Generated from ONE Victory Sales tracker'});
+  const g=k=>{const t=target(sc,m,k);return `${fmt(a[k])}${t?` / ${fmt(t)} (${pct(a[k]/t)})`:''}`};
+  const text=`*Performance — ${scopeName(sc)}*\n${asof}\n\n*Prepaid*\nMsian GA (IU>30): ${g('mk')}\n1V Prepaid Dealer TP: ${g('tp1v')}\nMsian 1GA TP: ${g('mtp1')}\n\n*Postpaid*\nPostpaid GA: ${g('post')}\n1V Postpaid Dealer TP: ${g('ptp1v')}\n\n*Device*\nDevice GA: ${g('dev')}\nSell In: ${g('si')}`;
+  shareModal({cv,text,file:`Performance-${m}.png`})}
+function drillShare(){
+  const{D,M}=drillAoa(),R=D.rows.slice(0,150);
+  const head=['Dealer',...M];const w=M.length?Array(M.length).fill(.5/M.length):[];
+  const rows=R.map(r=>({cells:[r.d.n,...r.c.map(c=>c.t+(c.hit?' ✓':''))],colors:[null,...r.c.map(c=>c.hit?'#12805c':null)]}));
+  const cv=drawReport({kicker:D.label.toUpperCase()+' BY DEALER',title:scopeName(D.sc),sub:`As of ${dlab(DATA.asOf)}  ·  ${D.rows.length} dealers${D.rows.length>150?' (top 150 shown)':''}`,head,widths:[.5,...w],rows,foot:D.hasHit?'Number: '+D.rule+'   ✓ = hit':'ONE Victory Sales tracker'});
+  shareModal({cv,text:`*${D.label} by dealer — ${scopeName(D.sc)}*\nAs of ${dlab(DATA.asOf)}\n\n`+R.slice(0,15).map((r,i)=>`${i+1}. ${r.d.n}: ${r.c[r.c.length-1].t}`).join('\n'),file:`${D.k}-by-dealer.png`})}
+async function drillExcel(){
+  if(typeof XLSX==='undefined'){toast('Excel tool did not load — check internet');return}
+  const{D,head,body}=drillAoa();const ws=XLSX.utils.aoa_to_sheet([[D.label+' by dealer — '+scopeName(D.sc)],['As of '+dlab(DATA.asOf)],[],head,...body]);
+  ws['!cols']=head.map((h,i)=>({wch:i===0?40:i<5?16:12}));const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'By dealer');
+  const buf=XLSX.write(wb,{type:'array',bookType:'xlsx'});
+  await saveFile(`${D.label.replace(/[^\w]+/g,'_')}_${DATA.months[D.j]}.xlsx`,new Blob([buf]))}
+
+/* ---------- 2) ONE Victory tracker ---------- */
+function ovView(){
+  if(VIEW.dealer)return dealerView(DATA.dealers.find(d=>(d.xd||d.xc)===VIEW.dealer));
+  const sc=VIEW.os||(VIEW.os=defScope()),j=curJ(),q=(VIEW.q||'').toLowerCase(),f=VIEW.of||'all',U=S.rates.unlock;
+  const base=inScope(sc).map(d=>({d,c:dealerCalc(d,j),p:j>0?dealerCalc(d,j-1):null}));
+  const lastHit=x=>x.p&&has(x.d,j-1)&&x.p.unlocked&&!x.c.unlocked;
+  let list=base;
+  if(q)list=list.filter(x=>(x.d.n+' '+x.d.xd+' '+x.d.xc).toLowerCase().includes(q));
+  if(f==='close')list=list.filter(x=>!x.c.unlocked&&x.c.need<=15);
+  if(f==='hit')list=list.filter(x=>x.c.unlocked);
+  if(f==='post')list=list.filter(x=>x.c.next&&x.c.next.needGa<=4);
+  if(f==='last')list=list.filter(lastHit);
+  list.sort((a,b)=>f==='last'?a.c.need-b.c.need:b.c.tot.ms-a.c.tot.ms);
+  const pm=j>0?mlab(DATA.months[j-1]):'';
+  return `<div class="bar"><div><label>Sales force / cluster</label>${scopeSel('os',sc)}</div><div><label>Search dealer name, xD or xC code</label><input id="oq" value="${esc(VIEW.q||'')}" placeholder="e.g. V-V SHOP or DS003-B0421"></div></div>
+  <div class="summary">
+   <div class="card"><div style="font-size:13px;color:var(--mut)">Dealers</div><div class="v">${base.length}</div></div>
+   <div class="card"><div style="font-size:13px;color:var(--mut)">Hit 1V (≥${U})</div><div class="v" style="color:var(--ok)">${base.filter(x=>x.c.unlocked).length}</div></div>
+   <div class="card"><div style="font-size:13px;color:var(--mut)">Close to hit (≤15 to go)</div><div class="v" style="color:var(--warn)">${base.filter(x=>!x.c.unlocked&&x.c.need<=15).length}</div></div>
+   <div class="card"><div style="font-size:13px;color:var(--mut)">Hit ${pm}, not yet now</div><div class="v" style="color:var(--bad)">${base.filter(lastHit).length}</div></div>
+  </div>
+  <div class="row" style="margin:14px 0">${[['all','All'],['close','Close to hit'],['hit','Hit'],['post','Near postpaid tier'],['last',`Hit ${pm}, not yet this month`]].map(([k,l])=>`<button class="btn sm ${f===k?'':'o'}" data-of="${k}">${l}</button>`).join('')}</div>
+  <div class="dl">${list.slice(0,150).map(({d,c,p})=>`<button class="drow" data-d="${esc(d.xd||d.xc)}">
+    <div><div class="nm">${esc(d.n)}</div><div class="cd">${esc(d.xd)} · ${esc(d.xc)} · ${esc(d.se.split(' ').slice(0,2).join(' '))}${f==='last'&&p?` · ${pm}: ${p.tot.ms}`:''}</div></div>
+    <div><div class="kline"><span>Msian IU</span><b>${c.tot.ms}/${U}</b></div><div class="meter" style="margin:4px 0 0"><i class="${c.unlocked?'ok':'y'}" style="width:${Math.min(100,c.tot.ms/U*100)}%"></i></div></div>
+    <div class="pp" style="text-align:right">${c.hitT?`<span class="pill ok">RM ${fmt(c.hitT.rm)}</span>`:`<span class="pill">Post ${c.post} · Dev ${c.dev}</span>`}</div></button>`).join('')||'<div class="card">No dealer in this list.</div>'}
+  ${list.length>150?`<div class="note">Showing 150 of ${list.length}. Use search to find others.</div>`:''}</div>`}
+function unlockLines(c){const U=S.rates.unlock;
+  return c.unlocked?{big:'HIT',l1:'ONE Victory UNLOCKED',l2:`Now ${c.tot.ms}/${U} Msian GA with Internet 30>`,l3:`ONE Victory Income ${rm(c.tot.ov)}`}
+  :{big:String(c.need),l1:'more Msian GA with Internet 30> to UNLOCK',l2:`Now ${c.tot.ms}/${U} Msian GA with Internet 30>`,l3:`Incentive from ${rm(c.tot.base)} > ONE Victory Income ${rm(c.tot.ov)} (Once Unlocked)`}}
+function dealerView(d){
+  const j=curJ(),c=dealerCalc(d,j),F=S.features,L=unlockLines(c);
+  const hist=DATA.months.map((m,i)=>({m,i})).filter(x=>x.i<j).slice(-12).reverse();
+  return `<div class="row" style="margin:0 0 12px;justify-content:space-between"><span class="row" style="margin:0"><button class="btn o sm" id="dback">← Back</button>${profOf(d.xd)?`<button class="btn o sm" data-pd="${esc(profOf(d.xd).id)}">Dealer profile</button>`:''}</span>${F.share?`<button class="btn g" id="dshare">Share to WhatsApp</button>`:''}</div>
+  <div class="dhead"><div><h3>${esc(d.n)}</h3><div class="codes">xD ${esc(d.xd)} · xC ${esc(d.xc)} · ${esc(d.cl)}</div><div class="codes">SE ${esc(d.se)}</div></div><div class="asof" style="align-self:start">As of <b>${dlab(DATA.asOf)}</b></div></div>
+  <div class="unlock ${c.unlocked?'ok':'no'}" style="margin-top:12px"><div class="big">${L.big}</div><div><div class="l1">${L.l1}</div><div class="l2">${L.l2}</div>${F.incentive?`<div class="l3">${L.l3}</div>`:''}</div></div>
+  <div class="sec"><h3>ONE Victory Prepaid</h3></div>
+  <div class="card scroll" style="padding:0"><table><thead><tr><th>Plan sold</th><th>Msian IU GA</th><th>Migrant IU GA</th>${F.incentive?'<th>Base incentive</th><th>ONE Victory</th>':''}</tr></thead><tbody>
+   ${c.rows.map(r=>`<tr><td>${planHtml(r.k)}</td><td><b>${r.ms}</b></td><td>${r.mg}</td>${F.incentive?`<td>${rm(r.base)}</td><td>${rm(r.ov)}</td>`:''}</tr>`).join('')}
+   <tr style="font-weight:800"><td>Total</td><td>${c.tot.ms}</td><td>${c.tot.mg}</td>${F.incentive?`<td>${rm(c.tot.base)}</td><td>${rm(c.tot.ov)}</td>`:''}</tr></tbody></table></div>
+  <div class="sec"><h3>ONE Victory Postpaid</h3></div>
+  <div class="pnow"><span>Now</span><div><b>${c.post}</b><span>Postpaid GA</span></div><div><b>${c.dev}</b><span>Device GA</span></div></div>
+  <div class="tiers">${c.tiers.map(t=>`<div class="tier ${t.hit?'hit':c.next===t?'next':''}"><div class="amt">RM ${fmt(t.rm)}</div><div class="note" style="margin:0">${t.ga} Postpaid GA, incl. ${t.dev} Device GA</div>
+    <div class="meter"><i class="${t.hit?'ok':''}" style="width:${Math.min(100,c.post/t.ga*100)}%"></i></div>
+    <div class="need">${t.hit?'<b style="color:var(--ok)">Achieved</b>':`Need <b>${t.needGa}</b> GA${t.needDev?` (incl. <b>${t.needDev}</b> Device)`:''}`}</div></div>`).join('')}</div>
+  <div class="summary" style="margin-top:12px">
+   <div class="card"><div style="font-size:13px;color:var(--mut)">Total prepaid GA</div><div class="v">${fmt(val(d,j,'pre'))}</div></div>
+   <div class="card"><div style="font-size:13px;color:var(--mut)">Msian GA</div><div class="v">${fmt(val(d,j,'ms'))}</div></div>
+   <div class="card"><div style="font-size:13px;color:var(--mut)">Migrant GA</div><div class="v">${fmt(val(d,j,'mig'))}</div></div>
+   <div class="card"><div style="font-size:13px;color:var(--mut)">Device sell in</div><div class="v">${fmt(c.si)}</div></div></div>
+  ${F.dealerHistory?`<div class="sec"><h3>Past months</h3></div><div class="card scroll" style="padding:0"><table><thead><tr><th>Month</th><th>Prepaid GA</th><th>Migrant</th><th>Msian</th><th>MVP</th><th>HVP</th><th>UHVP</th><th>Postpaid</th><th>Device GA</th><th>Sell In</th></tr></thead><tbody>
+   ${hist.map(({m,i})=>has(d,i)?`<tr><td>${mlab(m)}</td>${['pre','mig','ms','mvp','hvp','uhvp','post','dev','si'].map(k=>`<td>${fmt(val(d,i,k))}</td>`).join('')}</tr>`:`<tr><td>${mlab(m)}</td><td colspan="9" style="text-align:left;color:var(--mut)">No data</td></tr>`).join('')}</tbody></table></div>`:''}`}
+function shareText(d,c){
+  const L=unlockLines(c);let t=`*ONE Victory update — ${d.n}*\nAs of ${dlab(DATA.asOf)}\n\n`;
+  t+=c.unlocked?`✅ *ONE Victory UNLOCKED*\n${L.l2}\n`:`👉 *${c.need} more* Msian GA with Internet 30> to UNLOCK\n${L.l2}\n`;
+  if(S.features.incentive)t+=L.l3+'\n';
+  t+='\n*Plan sold (Msian / Migrant IU GA)*\n';c.rows.forEach(r=>t+=`• ${PLAN[r.k][0]} (${PLAN[r.k][1]}): ${r.ms} / ${r.mg}\n`);
+  t+=`\n*ONE Victory Postpaid*\nNow ${c.post} GA · ${c.dev} Device GA\n`;
+  c.tiers.forEach(x=>t+=`${x.hit?'✅':'▫️'} RM ${fmt(x.rm)}: ${needTxt(x)}\n`);
+  return t+`\nDevice Sell In: ${c.si}\n\nLet's push together! — ${USER.name}`}
+function dealerImage(d,c){
+  const W=1080,H=1460,cv=document.createElement('canvas');cv.width=W;cv.height=H;const x=cv.getContext('2d'),F='"Plus Jakarta Sans",Arial,sans-serif',L=unlockLines(c);
+  x.fillStyle='#f3f6fb';x.fillRect(0,0,W,H);x.fillStyle='#0a3a8c';x.fillRect(0,0,W,300);x.fillStyle='#ffc20e';x.fillRect(0,300,W,10);
+  x.fillStyle='#ffc20e';x.font=`800 32px ${F}`;x.fillText('ONE VICTORY UPDATE',60,78);
+  x.fillStyle='#fff';x.font=`800 50px ${F}`;wrap(x,d.n,960).slice(0,2).forEach((l,i)=>x.fillText(l,60,150+i*60));
+  x.font=`500 28px ${F}`;x.fillStyle='#cfe0ff';x.fillText(`xD ${d.xd}   ·   xC ${d.xc}   ·   As of ${dlab(DATA.asOf)}`,60,268);
+  const box=(yy,h,bg)=>{x.fillStyle=bg;x.beginPath();x.roundRect(60,yy,W-120,h,24);x.fill()};
+  box(345,240,c.unlocked?'#e3f6ee':'#fff3c4');const col=c.unlocked?'#12805c':'#4a3600';x.fillStyle=col;
+  x.font=`800 104px ${F}`;x.fillText(L.big,96,480);const tx=96+x.measureText(L.big).width+34;
+  x.font=`800 32px ${F}`;wrap(x,L.l1,W-120-tx).forEach((l,i)=>x.fillText(l,tx,412+i*40));
+  x.font=`600 28px ${F}`;x.fillText(L.l2,tx,412+wrap(x,L.l1,W-120-tx).length*40+28);
+  if(S.features.incentive){x.font=`700 26px ${F}`;wrap(x,L.l3,W-200).forEach((l,i)=>x.fillText(l,96,548+i*32))}
+  box(610,320,'#fff');x.fillStyle='#5b6880';x.font=`700 24px ${F}`;const cx=[96,620,800,980];
+  ['Plan sold','Msian IU','Migrant IU',S.features.incentive?'1V RM':''].forEach((h,i)=>{x.textAlign=i?'right':'left';x.fillText(h,cx[i],658)});
+  c.rows.forEach((r,i)=>{const yy=720+i*62;x.textAlign='left';x.fillStyle='#0f1a2e';x.font=`800 32px ${F}`;x.fillText(PLAN[r.k][0],96,yy);const w=x.measureText(PLAN[r.k][0]).width;
+    x.font=`500 22px ${F}`;x.fillStyle='#5b6880';x.fillText(`(${PLAN[r.k][1]})`,96+w+12,yy);
+    x.fillStyle='#0f1a2e';x.textAlign='right';x.font=`800 32px ${F}`;x.fillText(fmt(r.ms),cx[1],yy);x.fillText(fmt(r.mg),cx[2],yy);if(S.features.incentive)x.fillText(fmt(r.ov),cx[3],yy)});
+  x.strokeStyle='#e2e8f2';x.lineWidth=2;x.beginPath();x.moveTo(96,868);x.lineTo(984,868);x.stroke();
+  x.textAlign='left';x.font=`800 32px ${F}`;x.fillText('Total',96,908);x.textAlign='right';x.fillText(fmt(c.tot.ms),cx[1],908);x.fillText(fmt(c.tot.mg),cx[2],908);if(S.features.incentive)x.fillText(fmt(c.tot.ov),cx[3],908);
+  x.textAlign='left';box(960,110,'#0a3a8c');x.fillStyle='#cfe0ff';x.font=`600 28px ${F}`;x.fillText('Postpaid now',96,1028);
+  x.fillStyle='#fff';x.font=`800 56px ${F}`;x.fillText(`${c.post} GA · ${c.dev} Device GA`,330,1036);
+  c.tiers.forEach((t,i)=>{const bx=60+i*245,by=1095;x.fillStyle=t.hit?'#e3f6ee':'#fff';x.beginPath();x.roundRect(bx,by,225,220,20);x.fill();
+    x.strokeStyle=t.hit?'#12805c':(c.next===t?'#ffc20e':'#e2e8f2');x.lineWidth=4;x.stroke();
+    x.fillStyle='#0f1a2e';x.font=`800 38px ${F}`;x.fillText('RM '+fmt(t.rm),bx+20,by+58);
+    x.font=`500 22px ${F}`;x.fillStyle='#5b6880';x.fillText(`${t.ga} GA · ${t.dev} Device`,bx+20,by+96);
+    x.fillStyle=t.hit?'#12805c':'#c2381f';x.font=`800 30px ${F}`;
+    if(t.hit)x.fillText('Achieved',bx+20,by+160);else{x.fillText(`Need ${t.needGa} GA`,bx+20,by+150);if(t.needDev){x.font=`600 22px ${F}`;x.fillText(`incl. ${t.needDev} Device`,bx+20,by+186)}}});
+  x.fillStyle='#5b6880';x.font=`500 26px ${F}`;x.fillText(`Device Sell In: ${c.si}   ·   From: ${USER.name}`,60,1370);
+  x.fillStyle='#0a3a8c';x.fillRect(0,H-50,W,50);x.fillStyle='#fff';x.font=`700 22px ${F}`;x.fillText('Numbers are MTD and may change after final validation.',60,H-17);
+  return cv}
+
+/* ---------- 3) trend ---------- */
+const TMET=[['pre','Total Prepaid GA'],['ms','Msian GA'],['mig','Migrant GA'],['mk','Msian GA (IU>30)'],['mtp1','Msian 1GA TP'],['tp1','Prepaid 1GA TP'],['tp1v','1V Prepaid Dealer TP'],['lvp','LVP'],['mvp','MVP'],['hvp','HVP'],['uhvp','UHVP'],['post','Postpaid GA'],['mpost','Migrant Postpaid GA'],['ptp1','Postpaid 1GA TP'],['ptp1v','Postpaid 1V Dealer TP'],['dev','Device GA'],['devtp','Device GA TP'],['si','Device Sell In'],['sitp','Device Sell In TP']];
+const DMET=[['pre','Total Prepaid GA'],['ms','Msian GA'],['mig','Migrant GA'],['mk','Msian GA (IU>30)'],['lvp','LVP'],['mvp','MVP'],['hvp','HVP'],['uhvp','UHVP'],['post','Postpaid GA'],['mpost','Migrant Postpaid GA'],['dev','Device GA'],['si','Device Sell In']];
+function trendSeries(){
+  const ms=DATA.months.slice(-13),off=DATA.months.length-ms.length;
+  if(VIEW.tmode==='dealer'){const d=DATA.dealers.find(z=>(z.xd||z.xc)===VIEW.td);if(!d)return{ms,rows:[],d:null};
+    return{ms,d,rows:ms.map((m,i)=>Object.fromEntries(DMET.map(([k])=>[k,has(d,off+i)?val(d,off+i,k):null])))}}
+  const list=inScope(VIEW.ts);return{ms,rows:ms.map((m,i)=>agg(list,off+i))}}
+function trendView(){
+  const mode=VIEW.tmode||'overall',sc=VIEW.ts||(VIEW.ts=defScope());const MET=mode==='dealer'?DMET:TMET;
+  if(!MET.some(x=>x[0]===VIEW.tk))VIEW.tk='mk';const k=VIEW.tk;
+  const T=trendSeries();
+  let pick='';
+  if(mode==='dealer'){const q=(VIEW.tq||'').toLowerCase();const pool=inScope(sc);
+    const hits=q.length>=2?pool.filter(d=>(d.n+' '+d.xd+' '+d.xc).toLowerCase().includes(q)).slice(0,8):[];
+    pick=`<div class="card" style="margin-bottom:12px"><label class="flab" style="margin-top:0">Search dealer name, xD or xC code</label><input id="tq" value="${esc(VIEW.tq||'')}" placeholder="Type at least 2 letters">
+     <div class="sugg">${hits.map(d=>`<button class="btn o sm" style="justify-content:flex-start" data-td="${esc(d.xd||d.xc)}">${esc(d.n)} · ${esc(d.xd)}</button>`).join('')}</div>
+     ${T.d?`<div style="margin-top:10px"><span class="pill ok">Selected</span> <b>${esc(T.d.n)}</b> <span class="note">${esc(T.d.xd)} · ${esc(T.d.xc)} · SE ${esc(T.d.se)}</span></div>`:''}</div>`}
+  const body=(mode==='dealer'&&!T.d)?'<div class="card">Search and pick a dealer to see its 12-month trend.</div>':
+  `<div class="card"><div class="kline"><b style="font-size:16px">${MET.find(x=>x[0]===k)[1]} · last ${T.ms.length} months</b><span>${mlab(T.ms[T.ms.length-1])} is MTD to day ${mtdInfo().day}</span></div><div class="fig"><svg id="tsvg"></svg></div></div>
+  <div class="sec"><h3>All measures by month</h3><span class="pill">${T.ms.length} of 13 months loaded</span></div>
+  <div class="card scroll" style="padding:0"><table><thead><tr><th>Measure</th>${T.ms.map(m=>`<th>${mlab(m)}</th>`).join('')}</tr></thead><tbody>
+   ${MET.map(([v,l])=>`<tr><td>${l}</td>${T.rows.map(r=>`<td>${fmt(r[v])}</td>`).join('')}</tr>`).join('')}</tbody></table></div>
+  <div class="note">${mode==='dealer'?'Dealer numbers by month; "–" means the dealer had no record that month.':'Past months are grouped by each dealer\'s current SE and cluster, so moved dealers follow their new SE.'}</div>`;
+  return `<div class="bar"><div style="flex:0 0 auto"><label>View</label><div class="seg"><button data-tmode="overall" class="${mode==='overall'?'on':''}">SE / Cluster</button><button data-tmode="dealer" class="${mode==='dealer'?'on':''}">By dealer</button></div></div>
+   <div><label>${mode==='dealer'?'Search within':'Sales force / cluster'}</label>${scopeSel('ts',sc)}</div><div><label>Measure</label><select id="tk">${MET.map(([v,l])=>`<option value="${v}" ${v===k?'selected':''}>${l}</option>`).join('')}</select></div></div>${pick}${body}`}
+function drawTrend(){
+  const s=$('#tsvg');if(!s)return;const T=trendSeries(),k=VIEW.tk,ms=T.ms,v=T.rows.map(r=>r[k]);
+  const draw=()=>{const W=s.clientWidth,H=s.clientHeight;if(!W)return;const p={l:10,r:10,t:28,b:30},mx=Math.max(...v.map(x=>x||0),1)*1.1,bw=(W-p.l-p.r)/v.length,small=W<520;
+    s.innerHTML=v.map((y,i)=>{const h=(H-p.t-p.b)*(y||0)/mx,x=p.l+i*bw+bw*.15,last=i===v.length-1;
+      return `<rect x="${x}" y="${H-p.b-h}" width="${bw*.7}" height="${h}" rx="5" fill="${last?'#ffc20e':'#1557c9'}"/>
+      ${!small||last||i%2===v.length%2?`<text x="${x+bw*.35}" y="${H-p.b-h-7}" text-anchor="middle" font-size="12" font-weight="700" fill="currentColor">${fmt(y)}</text>`:''}
+      <text x="${x+bw*.35}" y="${H-10}" text-anchor="middle" font-size="12" fill="currentColor" opacity=".65">${small?MON[+ms[i].slice(5)-1].slice(0,1):mlab(ms[i])}</text>`}).join('')};
+  const ro=new ResizeObserver(draw);ro.observe(s);draw()}
+
+/* ---------- 5) dealer profile ---------- */
+let PROF={asOf:'',dealers:[]};
+const SYS={MSA:'Digi MSA',PULSE:'Celcom Pulse'};
+const allCodes=p=>[...p.mc,...p.s];
+function profScope(){const sc=USER.role==='admin'?'ALL':USER.scope;if(sc==='ALL')return PROF.dealers;const[t,v]=sc.split('|');
+  if(t==='SS')return PROF.dealers.filter(p=>p.ss===v);if(t==='SE')return PROF.dealers.filter(p=>p.se===v);
+  const xs=new Set(inScope(sc).map(d=>d.xd));return PROF.dealers.filter(p=>p.xd.some(x=>xs.has(x)))}
+const profOf=xd=>PROF.dealers.find(p=>p.xd.includes(xd));
+const nLogin=p=>allCodes(p).reduce((a,x)=>a+x.l.length,0);
+const cpy=v=>`<button class="btn o sm" data-copy="${esc(v)}">Copy</button>`;
+const seeOwner=()=>USER.role==='admin'||S.features.ownerInfo;
+const maskIC=v=>{const t=String(v);return t.length>4?t.slice(0,-4).replace(/[0-9A-Z]/gi,'•')+t.slice(-4):t};
+function loginTable(L){if(!L.length)return '<div class="note">No login on this code.</div>';
+  return `<div class="scroll" style="margin-top:10px"><table class="ltab"><thead><tr><th>User ID</th><th>Role</th><th>Source system</th><th></th></tr></thead><tbody>
+  ${L.map(x=>`<tr><td><b>${esc(x[0])}</b></td><td style="text-align:left"><span class="pill role-${esc(x[1].toLowerCase())}">${esc(x[1])}</span></td><td style="text-align:left">${SYS[x[2]]||esc(x[2])}</td><td>${cpy(x[0])}</td></tr>`).join('')}</tbody></table></div>`}
+function profView(){
+  if(!PROF.dealers.length)return `<div class="card">No dealer profile loaded yet.${USER.role==='admin'?' Upload the Dealer Profile file in Admin › Upload data.':''}</div>`;
+  if(VIEW.pd){const p=PROF.dealers.find(x=>x.id===VIEW.pd);if(p)return profDetail(p)}
+  const q=(VIEW.pq||'').toLowerCase(),all=profScope(),own=seeOwner();
+  const hay=p=>(p.n+' '+p.xd.join(' ')+' '+allCodes(p).map(c=>c.c+' '+c.va+' '+c.l.map(l=>l[0]).join(' ')).join(' ')+(own&&p.ow?' '+[p.ow.n,p.ow.ic,p.ow.brn,p.ow.tin].join(' '):'')).toLowerCase();
+  const list=q?all.filter(p=>hay(p).includes(q)):all;
+  return `<div class="bar"><div><label>Search dealer, owner, DMS code, login ID, BRN or virtual account</label><input id="pq" value="${esc(VIEW.pq||'')}" placeholder="e.g. 88 GADGET, NOS69659, DS002-N0546-1"></div></div>
+  <div class="summary"><div class="card"><div style="font-size:13px;color:var(--mut)">Dealers</div><div class="v">${fmt(all.length)}</div></div>
+   <div class="card"><div style="font-size:13px;color:var(--mut)">Main / sales codes</div><div class="v">${fmt(all.reduce((a,p)=>a+p.mc.length,0))} / ${fmt(all.reduce((a,p)=>a+p.s.length,0))}</div></div>
+   <div class="card"><div style="font-size:13px;color:var(--mut)">Login IDs</div><div class="v">${fmt(all.reduce((a,p)=>a+nLogin(p),0))}</div></div>
+   <div class="card"><div style="font-size:13px;color:var(--mut)">File date</div><div class="v" style="font-size:18px">${PROF.asOf?dlab(PROF.asOf):'–'}</div></div></div>
+  ${USER.role==='admin'&&!PROF.dealers.some(p=>p.ow)?'<div class="banner" style="margin-top:12px">Owner name, IC, BRN and TIN are not loaded yet. Upload the Dealer Profile file in Admin › Upload data.</div>':''}
+  <div class="dl plist" style="margin-top:14px">${list.slice(0,100).map(p=>`<button class="drow" data-pd="${esc(p.id)}"><div><div class="nm">${esc(p.n)}</div><div class="cd">${allCodes(p).map(c=>esc(c.c)).join(' · ')}${own&&p.ow&&p.ow.n?' · '+esc(p.ow.n):''} · SE ${esc(p.se)}</div></div><span class="pill">${nLogin(p)} login${nLogin(p)===1?'':'s'}</span></button>`).join('')||'<div class="card">No dealer found.</div>'}
+  ${list.length>100?`<div class="note">Showing 100 of ${fmt(list.length)}. Search to narrow down.</div>`:''}</div>`}
+function profDetail(p){
+  const linked=DATA.dealers.filter(d=>p.xd.includes(d.xd)),vas=p.s.filter(x=>x.va).concat(p.mc.filter(x=>x.va));
+  const o=p.ow,row=(l,v,extra)=>`<div class="kv"><span>${l}</span><b>${v?esc(v):'<span class="note">Not in file</span>'}</b>${v?(extra||cpy(v)):''}</div>`;
+  const owner=seeOwner()?`<div class="sec"><h3>Dealer owner</h3></div><div class="card ownc">
+     ${o?`${row('Owner name',o.n)}
+     <div class="kv"><span>Owner IC</span>${o.ic?`<b class="ic" data-full="${esc(o.ic)}" data-mask="${esc(maskIC(o.ic))}">${esc(maskIC(o.ic))}</b><button class="btn o sm" data-reveal>Show</button>`:'<b><span class="note">Not in file</span></b>'}</div>
+     ${row('BRN',o.brn)}${row('TIN number',o.tin)}`:'<div class="note">Owner details are not loaded. Admin uploads the Dealer Profile file in Admin › Upload data.</div>'}
+     ${vas.map(x=>`<div class="kv va"><span>Maybank Virtual Account · ${esc(x.c)}</span><b>${esc(x.va)}</b>${cpy(x.va)}</div>`).join('')||'<div class="kv"><span>Maybank Virtual Account</span><b><span class="note">Not set</span></b></div>'}</div>`:'';
+  const codeCard=(x,isMain)=>`<div class="card" style="margin-bottom:12px"><div class="kline"><span><small style="display:block;font-size:12px;color:var(--mut)">${isMain?'Main code':'Sales code'}</small><span class="code" style="color:var(--ink)">${esc(x.c)}</span></span><span><span class="pill ${x.st==='ACTIVE'?'ok':'bad'}">${esc(x.st||'–')}</span> ${cpy(x.c)}</span></div>
+     ${x.va?`<div class="va"><span><small style="display:block;font-size:12px">Maybank Virtual Account</small><b>${esc(x.va)}</b></span>${cpy(x.va)}</div>`:''}${loginTable(x.l)}</div>`;
+  return `<div class="row" style="margin:0 0 12px"><button class="btn o sm" id="pdback">← Back</button>${linked.map(d=>`<button class="btn sm" data-d="${esc(d.xd)}">ONE Victory card · ${esc(d.xd)}</button>`).join('')}</div>
+  <div class="dhead"><div><h3>${esc(p.n)}</h3><div class="codes">${allCodes(p).map(c=>esc(c.c)).join(' · ')}${p.xd.length?' · xD '+p.xd.map(esc).join(', '):''}</div><div class="codes">SE ${esc(p.se)} · SS ${esc(p.ss)}</div></div>
+   <div class="asof" style="align-self:start">${nLogin(p)} login${nLogin(p)===1?'':'s'}</div></div>
+  ${owner}
+  <div class="sec"><h3>Main code</h3><span class="pill">BOS / WOS / NOS</span></div>${p.mc.map(x=>codeCard(x,true)).join('')||'<div class="card">No main code in file.</div>'}
+  <div class="sec"><h3>Sales codes</h3><span class="pill">BDS / WDS / NDS</span></div>${p.s.map(x=>codeCard(x,false)).join('')||'<div class="card">No sales code in file.</div>'}`}
+function parseProfiles(wb){
+  const rows=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{header:1,raw:true,defval:null});const H=rows[0].map(h=>String(h??'').trim().toLowerCase().replace(/'+$/,''));
+  const ci=n=>{const i=H.indexOf(n);return i<0?null:i};
+  const c={did:ci('dealer id'),name:ci('dealer name'),uid:ci('user id'),role:ci('user role'),src:ci('source system'),va:ci('mbb virtual account')??ci('virtual account'),dst:ci('dealer id status'),se:ci('se name'),ss:ci('ss name'),sm:ci('sm name'),on:ci('owner name'),ic:ci('owner ic'),brn:ci('brn'),tin:ci('tin number')};
+  for(const k of['did','name','uid','role','src'])if(c[k]==null)throw new Error('Column not found: '+k);
+  const S_=v=>v==null?'':typeof v==='number'?String(Math.round(v)):String(v).trim(),top=o=>Object.entries(o).sort((a,b)=>b[1]-a[1])[0]?.[0]||'',ORD={Owner:0,Supervisor:1,Sales:2};
+  const G=new Map();
+  for(const r of rows.slice(1)){if(!r||r[c.did]==null)continue;const key=S_(r[c.name]).toUpperCase();
+    let g=G.get(key);if(!g){g={id:key,n:S_(r[c.name]),se:{},ss:{},sm:{},codes:new Map(),xd:new Set(),ow:null};G.set(key,g)}
+    for(const k of['se','ss','sm'])if(c[k]!=null){const v=S_(r[c[k]]);g[k][v]=(g[k][v]||0)+1}
+    if(c.on!=null&&!g.ow&&(S_(r[c.on])||S_(r[c.brn]))) g.ow={n:S_(r[c.on]),ic:c.ic!=null?S_(r[c.ic]):'',brn:c.brn!=null?S_(r[c.brn]):'',tin:c.tin!=null?S_(r[c.tin]):''};
+    const code=S_(r[c.did]);let cd=g.codes.get(code);if(!cd){cd={c:code,va:'',st:c.dst!=null?S_(r[c.dst]):'',l:[]};g.codes.set(code,cd)}
+    const va=c.va!=null?S_(r[c.va]):'';if(va&&va!=='0')cd.va=va;
+    const uid=S_(r[c.uid]),role=S_(r[c.role]).replace('CDDEALER_','').toLowerCase().replace(/^./,x=>x.toUpperCase());
+    cd.l.push([uid,role,S_(r[c.src]).toUpperCase()==='MSA'?'MSA':'PULSE']);
+    const mx=uid.match(/^(DS\d{3}-[A-Z]{1,2}\d{3,4})-\d+$/);if(mx)g.xd.add(mx[1])}
+  return [...G.values()].map(g=>{const codes=[...g.codes.values()];codes.forEach(x=>x.l.sort((a,b)=>(ORD[a[1]]??9)-(ORD[b[1]]??9)||(a[2]!=='MSA')-(b[2]!=='MSA')||a[0].localeCompare(b[0])));
+    const isMain=x=>x.c.slice(1,3)==='OS',bc=(a,b)=>a.c.localeCompare(b.c);
+    return{id:g.id,n:g.n,se:top(g.se),ss:top(g.ss),sm:top(g.sm),xd:[...g.xd].sort(),ow:g.ow,mc:codes.filter(isMain).sort(bc),s:codes.filter(x=>!isMain(x)).sort(bc)}}).sort((a,b)=>a.n.localeCompare(b.n))}
+
+/* ---------- 4) admin ---------- */
+function uploadMonths(){const t=todayKL(),[y,m]=t.split('-').map(Number);const out=[];for(let i=0;i<13;i++)out.push(ymOf(new Date(y,m-1-i,1)));return out}
+function adminView(){
+  const A=VIEW.at||'data',tabs=[['data','Upload data'],['users','Users'],['targets','Targets'],['rates','Incentive & tiers'],['feat','Logo & features']];let body='';
+  if(A==='data'){
+    const opts=uploadMonths(),cur=opts[0],sel=VIEW.upm||cur;
+    const slots=opts.slice().reverse().map(m=>{const j=DATA.months.indexOf(m);return `<div class="slot ${j>=0?'on':''}"><b>${mlab(m)}${m===cur?' · current':''}</b>${j>=0?(j===curJ()&&m===DATA.months[curJ()]?'As of '+dlab(DATA.asOf):'Closing loaded')+' · '+DATA.dealers.filter(d=>d.h[j]).length+' dealers':'Not loaded'}</div>`}).join('');
+    body=`<div class="card"><b>13 monthly slots (current + 12 past)</b><div class="note" style="margin-bottom:10px">Each past month = its own closing report. Current month = latest MTD file with an "as of" date.</div><div class="slots">${slots}</div></div>
+    <div class="card" style="margin-top:12px"><b>Upload a performance file</b><div class="note">Choose which month this file is for. Only that month's numbers are taken, even if the file also has the 2 months before it.</div>
+     <div class="bar" style="margin-top:10px"><div style="flex:0 1 220px"><label>Month of this file</label><select id="upm">${opts.map(m=>`<option value="${m}" ${m===sel?'selected':''}>${MON[+m.slice(5)-1]} ${m.slice(0,4)}${m===cur?' (current month)':' (closing)'}</option>`).join('')}</select></div>
+      <div id="upasofw" style="flex:0 1 200px" class="${sel===cur?'':'hide'}"><label>Data as of date</label><input type="date" id="upasof" value="${DATA.asOf.slice(0,7)===cur?DATA.asOf:todayKL()}"></div>
+      <div><label>File</label><input type="file" id="upf" accept=".xlsx,.xls,.xlsb"></div></div>
+     <div class="row"><button class="btn" id="upgo">Upload &amp; process</button></div><div class="log" id="uplog" style="margin-top:10px">Ready.</div></div>
+    <div class="card" style="margin-top:12px"><b>Starter data (one time)</b><div class="note">Loads May–Nov 2026 performance, November targets and dealer codes/logins prepared from your Excel files. Use once on a new system. Owner IC/BRN/TIN come from the Dealer Profile file below.</div>
+     <div class="bar" style="margin-top:10px"><div><label>Starter file (onevictory-starter.json)</label><input type="file" id="stf" accept=".json,application/json"></div><div style="flex:0 0 auto"><button class="btn" id="stgo">Import starter data</button></div></div><div class="log" id="stlog">Ready.</div></div>
+    <div class="card" style="margin-top:12px"><b>Dealer Profile file</b><div class="note">Columns used: Dealer Id, Dealer Name, Owner Name, Owner IC, BRN, TIN Number, User Id, User Role, Source System, MBB Virtual Account, SE/SS/SM Name. Codes are grouped by dealer name. Owner IC/BRN/TIN are stored on the server and shown only to admin, or to users when you allow it in Logo &amp; features. Uploading replaces the current list. Loaded now: ${fmt(PROF.dealers.length)} dealers${PROF.asOf?' · '+dlab(PROF.asOf):''}.</div>
+     <div class="bar" style="margin-top:10px"><div><label>File</label><input type="file" id="pff" accept=".xlsx,.xls,.xlsb,.csv"></div><div style="flex:0 0 auto"><button class="btn" id="pfgo">Upload dealer profile</button></div></div><div class="log" id="pflog">Ready.</div></div>`}
+  if(A==='users'){
+    body=`<div class="card scroll" style="padding:0"><table><thead><tr><th>User ID</th><th>Name</th><th>Email</th><th>Role</th><th>Can see</th><th></th></tr></thead><tbody>
+     ${S.users.map((u,i)=>`<tr><td><b>${esc(u.id)}</b></td><td>${esc(u.name)}</td><td>${esc(u.email)}</td><td><span class="pill ${u.role==='admin'?'ok':''}">${u.role}</span></td><td>${esc(u.scope==='ALL'?'All':u.scope.replace('|',' · '))}</td><td><button class="btn o sm" data-ureset="${i}">Reset password</button> ${u.id!==USER.id?`<button class="btn o sm" data-udel="${i}">Remove</button>`:''}</td></tr>`).join('')}</tbody></table></div>
+     <form class="card" id="uform" style="margin-top:12px"><b>Create user</b><div class="bar" style="margin-top:10px">
+      <div><label>User ID</label><input id="nid" required></div><div><label>Full name</label><input id="nname" required></div><div><label>Email</label><input id="nmail" type="email" required></div>
+      <div><label>Temporary password</label><input id="npw" required></div><div><label>Role</label><select id="nrole"><option value="user">User (sales force)</option><option value="admin">Admin</option></select></div>
+      <div><label>Can see</label><select id="nscope"><option value="ALL">All</option>${scopeOptions().filter(o=>o[0]!=='ALL').map(([v,l])=>`<option value="${esc(v)}">${esc(l.trim())}</option>`).join('')}</select></div></div>
+      <button class="btn">Create user</button><div class="note">Password: at least 6 characters. Users can change their own password after login. "Reset password" here overwrites it.</div></form>`}
+  if(A==='targets'){
+    const j=VIEW.tj??curJ(),m=DATA.months[j],T=S.targets[m]||{},mode=VIEW.tmode2||'person';
+    const ses=[...new Set(DATA.dealers.map(d=>d.se))].sort(),sss=[...new Set(DATA.dealers.map(d=>d.ss))].sort();
+    const people=[...sss.map(s=>['SS|'+s,'SS · '+s]),...ses.map(e=>['SE|'+e,'SE · '+e])];
+    const head=`<div class="bar"><div style="flex:0 0 auto"><label>Update</label><div class="seg"><button data-tm2="person" class="${mode==='person'?'on':''}">By individual</button><button data-tm2="table" class="${mode==='table'?'on':''}">Whole table</button></div></div>
+      <div style="flex:0 1 200px"><label>Target month</label>${monthSel('tj',j)}</div><div style="flex:0 0 auto"><button class="btn o" id="tcopy">Copy from previous month</button></div></div>`;
+    if(mode==='table'){
+      const row=(key,label)=>`<tr><td><b>${esc(label)}</b></td>${TKEYS.map(([k])=>`<td><input class="tinput" data-tk="${esc(key)}|${k}" value="${(T[key]||{})[k]??''}" inputmode="numeric"></td>`).join('')}</tr>`;
+      body=head+`<div class="card scroll" style="padding:0"><table><thead><tr><th>SS / SE</th>${TKEYS.map(([,l])=>`<th style="white-space:normal;min-width:84px">${l}</th>`).join('')}</tr></thead><tbody>
+       ${sss.map(s=>row('SS|'+s,'SS · '+s)).join('')}${ses.map(e=>row('SE|'+e,e)).join('')}</tbody></table></div><div class="note">Saved automatically. Blank SS target = sum of its SE targets.</div>`}
+    else{const who=VIEW.tw||'SE|'+ses[0],t=T[who]||{},lastA=j>0?agg(inScope(who),j-1):null,lm=j>0?mlab(DATA.months[j-1]):'';
+      const grp=(name,arr)=>`<div class="sec"><h3>${name}</h3></div><div class="tform">${arr.map(([k,l])=>`<label>${l}<input data-tk="${esc(who)}|${k}" value="${t[k]??''}" inputmode="numeric" placeholder="No target">${lastA?`<small>${lm} actual: ${fmt(lastA[k])}</small>`:''}</label>`).join('')}</div>`;
+      body=head+`<div class="card"><label class="flab" style="margin-top:0">SS / SE</label><select id="tw">${people.map(([v,l])=>`<option value="${esc(v)}" ${v===who?'selected':''}>${esc(l)}</option>`).join('')}</select>
+       <div class="note">${inScope(who).length} dealers · ${esc([...new Set(inScope(who).map(d=>d.cl))].join(', '))}</div>
+       ${grp('Prepaid',KPIS.prepaid)}${grp('Postpaid',KPIS.postpaid)}${grp('Device',KPIS.device)}
+       <div class="row" style="margin-top:14px"><button class="btn" id="tsave">Save targets</button></div><div class="note">Each box also saves when you leave it.</div></div>`}}
+  if(A==='rates'){const R=S.rates,inp=(p,v)=>`<input class="tinput" data-rate="${p}" value="${v}" inputmode="numeric">`;
+    body=`<div class="two"><div class="card"><b>ONE Victory Prepaid</b><div class="kline" style="margin:10px 0"><span>Msian IU GA (Internet 30>) needed to unlock</span>${inp('unlock',R.unlock)}</div>
+     <table><thead><tr><th>Plan</th><th>Base Msian</th><th>Base Migrant</th><th>1V Msian</th><th>1V Migrant</th></tr></thead><tbody>
+     ${['mvp','hvp','uhvp'].map(k=>`<tr><td>${planHtml(k)}</td><td>${inp('base.'+k+'.0',R.base[k][0])}</td><td>${inp('base.'+k+'.1',R.base[k][1])}</td><td>${inp('ov.'+k+'.0',R.ov[k][0])}</td><td>${inp('ov.'+k+'.1',R.ov[k][1])}</td></tr>`).join('')}</tbody></table></div>
+     <div class="card"><b>ONE Victory Postpaid tiers</b><table style="margin-top:10px"><thead><tr><th>Tier</th><th>Cash + voucher RM</th><th>Postpaid GA</th><th>Device GA in it</th></tr></thead><tbody>
+     ${R.tiers.map((t,i)=>`<tr><td>T${i+1}</td><td>${inp('tiers.'+i+'.rm',t.rm)}</td><td>${inp('tiers.'+i+'.ga',t.ga)}</td><td>${inp('tiers.'+i+'.dev',t.dev)}</td></tr>`).join('')}</tbody></table></div></div>`}
+  if(A==='feat'){const f=S.features,tg=(k,l,n)=>`<label class="card" style="display:flex;gap:12px;align-items:center;cursor:pointer"><input type="checkbox" data-feat="${k}" ${f[k]?'checked':''} style="width:22px;min-height:22px;flex:none"><span><b>${l}</b><br><span class="note">${n}</span></span></label>`;
+    body=`<div class="grid">${tg('incentive','Show incentive RM to users','Base and ONE Victory income on dealer cards and WhatsApp')}${tg('share','WhatsApp share button','Picture + text update to dealer')}${tg('trend','12-Month Trend tab','Monthly history for SE, cluster and dealer')}${tg('dealerHistory','Dealer past months','History table on each dealer card')}${tg('ownerInfo','Show owner IC / BRN / TIN to users','Admin always sees it. Off = sales force sees codes, logins and virtual account only. Users see it after they reopen the app.')}</div>
+    <div class="card" style="margin-top:12px"><b>Logo</b><div class="note">Shown on the login page and top bar. PNG or JPG; a wide logo on a transparent or white background works best.</div>
+     <div class="bar" style="margin-top:10px;align-items:center"><div style="flex:0 0 auto;background:var(--soft);border-radius:12px;padding:10px">${S.logo?`<img class="logo" src="${S.logo}" alt="Current logo">`:'<span class="note">No logo yet</span>'}</div><div><input type="file" id="logof" accept="image/*"></div>${S.logo?'<div style="flex:0 0 auto"><button class="btn o" id="logodel">Remove logo</button></div>':''}</div></div>
+    <div class="card" style="margin-top:12px"><b>Announcement banner</b><div class="note">Shown at the top for all users. Leave empty to hide.</div><input id="fban" value="${esc(S.banner)}" style="margin-top:8px"></div>`}
+  return `<div class="row" style="margin:0 0 16px">${tabs.map(([k,l])=>`<button class="btn sm ${A===k?'':'o'}" data-at="${k}">${l}</button>`).join('')}</div>${body}`}
+
+/* --- xlsx upload parser: finds headers by name --- */
+const MAP={pre:'TOTAL PREPAID GA',mig:'MIGRANT GA',ms:'MSIAN GA',aw:'AWIU7 SUBS',mk:'MSIAN IU7>=RM30',lvp:'MSIAN IU7 <RM30',mvp:'MSIAN IU7 >=RM30-44',hvp:'MSIAN IU7 >=RM45-54',uhvp:'MSIAN IU7 >=RM55',gmvp:'MIGRANT IU7 >=RM30-44',ghvp:'MIGRANT IU7 >=RM45-54',guhvp:'MIGRANT IU7 >=RM55',post:'POSTPAID GA TTL',mpost:'MIGRANT POSTPAID GA',dev:'POSTPAID DEVICE GA',pmj:'DEVICE PMJ',si:'DEVICE SELL IN'};
+const ym=v=>{if(v instanceof Date)return ymOf(v);if(typeof v==='number'&&v>40000&&v<60000){const d=XLSX.SSF.parse_date_code(v);return d.y+'-'+String(d.m).padStart(2,'0')}return null};
+function parseBook(wb,want){
+  for(const sn of wb.SheetNames){const rows=XLSX.utils.sheet_to_json(wb.Sheets[sn],{header:1,raw:true,defval:null});
+    const hr=rows.slice(0,15).findIndex(r=>r&&r.some(x=>String(x??'').trim()==='DIGI DLR CODE'));if(hr<0)continue;
+    const hdr=rows[hr],lab=rows[hr-1]||[],sec=rows[1]||[],idx={};hdr.forEach((v,i)=>{if(v!=null&&!ym(v))idx[String(v).trim()]=i});
+    const groups=[];let cur=null,prev=null;
+    hdr.forEach((v,i)=>{const m=ym(v);if(m||v==='MOM'){if(!cur||(m&&prev&&m<=prev)){cur={cols:[],label:null,sec:sec[i]};groups.push(cur)}cur.cols.push([i,m]);if(lab[i])cur.label=String(lab[i]).replace(/\s+/g,' ').trim();if(sec[i]&&!cur.sec)cur.sec=sec[i];if(m)prev=m}else{cur=null;prev=null}});
+    const col={};for(const[k,l]of Object.entries(MAP))for(const g of groups)if(g.sec==='CD'&&g.label===l)for(const[c,m]of g.cols)if(m===want&&col[k]==null)col[k]=c;
+    const inFile=[...new Set(groups.flatMap(g=>g.cols.map(c=>c[1])).filter(Boolean))].sort();
+    if(!Object.keys(col).length)return{sheet:sn,inFile,out:[],found:[]};
+    const g=(r,n)=>idx[n]!=null&&r[idx[n]]!=null?String(r[idx[n]]).trim():'';const out=[];
+    for(const r of rows.slice(hr+1)){if(!r||!g(r,'DEALER NAME'))continue;
+      out.push({info:{n:g(r,'DEALER NAME'),xd:g(r,'DIGI DLR CODE'),xc:g(r,'CELCOM OUTLET ID'),se:g(r,'SE'),ss:g(r,'SS'),sm:g(r,'SM'),cl:g(r,'CLUSTER'),hq:g(r,'HQ/BRANCH')},
+        v:DATA.keys.map(k=>{if(col[k]==null)return null;const x=parseFloat(r[col[k]]);return isNaN(x)?0:Math.round(x)})})}
+    return{sheet:sn,inFile,out,found:Object.keys(col)}}
+  throw new Error('No sheet with a "DIGI DLR CODE" header found')}
+/* ---------- events ---------- */
+document.addEventListener('click',async e=>{
+  const t=e.target.closest('button,a,[data-drill],tr[data-d]');if(!t)return;
+  if(t.dataset.tab){TAB=t.dataset.tab;VIEW.dealer=null;VIEW.drill=null;VIEW.pd=null;VIEW.pfrom=null;renderShell();return}
+  if(t.dataset.drill){VIEW.drill=t.dataset.drill;VIEW.dq='';VIEW.dhit=false;render();return}
+  if(t.id==='drback'){VIEW.drill=null;render();return}
+  if(t.id==='drxls'){drillExcel();return}
+  if(t.id==='drimg'){drillShare();return}
+  if(t.id==='dhit'){VIEW.dhit=!VIEW.dhit;render(true);return}
+  if(t.id==='pshare'){perfShare();return}
+  if(t.id==='pcust'){custDialog();return}
+  if(t.dataset.pd){VIEW.pd=t.dataset.pd;if(TAB!=='prof'){VIEW.pfrom=TAB;TAB='prof';renderShell()}else render();return}
+  if(t.id==='pdback'){VIEW.pd=null;if(VIEW.pfrom){TAB=VIEW.pfrom;VIEW.pfrom=null;renderShell()}else render(true);return}
+  if(t.dataset.reveal!=null){const b=t.parentElement.querySelector('.ic');const sh=t.textContent==='Show';b.textContent=sh?b.dataset.full:b.dataset.mask;t.textContent=sh?'Hide':'Show';return}
+  if(t.dataset.copy!=null){try{await navigator.clipboard.writeText(t.dataset.copy);toast('Copied '+t.dataset.copy)}catch(_){toast(t.dataset.copy)}return}
+  if(t.id==='logodel'){S.logo=null;await saveSetting('logo',null);renderShell();return}
+  if(t.id==='pfgo'){const f=$('#pff').files[0],log=$('#pflog');if(!f){log.textContent='Pick the file first.';return}
+    if(typeof XLSX==='undefined'){log.textContent='Excel reader did not load. Check internet and reload.';return}
+    log.textContent='Reading '+f.name+'…';try{const list=parseProfiles(XLSX.read(await f.arrayBuffer(),{type:'array'}));log.textContent='Saving to server…';busy(true,'Saving dealer profiles…');await writeProfiles(list);busy(false);
+      log.textContent=`✓ ${fmt(list.length)} dealers (${fmt(list.filter(p=>p.ow).length)} with owner details), ${fmt(list.reduce((a,p)=>a+p.mc.length,0))} main + ${fmt(list.reduce((a,p)=>a+p.s.length,0))} sales codes, ${fmt(list.reduce((a,p)=>a+nLogin(p),0))} login IDs.`;const k=log.textContent;render(true);$('#pflog').textContent=k}
+    catch(err){busy(false);log.textContent='✗ '+err.message}return}
+  if(t.id==='stgo'){const f=$('#stf').files[0],log=$('#stlog');if(!f){log.textContent='Pick the starter file first.';return}
+    busy(true,'Importing starter data…');try{await importStarter(JSON.parse(await f.text()),m=>{log.textContent=m;$('#loadmsg').textContent=m});busy(false);renderShell();VIEW.at='data';toast('Starter data imported')}catch(err){busy(false);$('#stlog').textContent='✗ '+(err.message||err)}return}
+  if(t.dataset.se){e.preventDefault();VIEW.ps='SE|'+t.dataset.se;render();return}
+  if(t.dataset.d){VIEW.dealer=t.dataset.d;VIEW.from=TAB;TAB='ov';renderShell();return}
+  if(t.id==='dback'){VIEW.dealer=null;if(VIEW.from&&VIEW.from!=='ov'){TAB=VIEW.from;VIEW.from=null;renderShell()}else render();return}
+  if(t.id==='dshare'){const d=DATA.dealers.find(z=>(z.xd||z.xc)===VIEW.dealer),c=dealerCalc(d,curJ());shareModal({cv:dealerImage(d,c),text:shareText(d,c),file:'1V-'+(d.xd||d.xc)+'.png'});return}
+  if(t.id==='mclose'){$('#modal').innerHTML='';return}
+  if(t.dataset.of){VIEW.of=t.dataset.of;render(true);return}
+  if(t.dataset.at){VIEW.at=t.dataset.at;render();return}
+  if(t.dataset.tmode){VIEW.tmode=t.dataset.tmode;render(true);return}
+  if(t.dataset.td){VIEW.td=t.dataset.td;VIEW.tq='';render(true);return}
+  if(t.dataset.tm2){VIEW.tmode2=t.dataset.tm2;render(true);return}
+  if(t.id==='tsave'){document.querySelectorAll('.tform input').forEach(i=>i.dispatchEvent(new Event('change',{bubbles:true})));toast('Targets saved');return}
+  if(t.id==='bout'){await SB.auth.signOut();USER=null;$('#app').classList.add('hide');$('#login').classList.remove('hide');$('#lpw').value='';return}
+  if(t.id==='bpw'){pwDialog();return}
+  if(t.dataset.ureset){const u=S.users[+t.dataset.ureset],p=Math.random().toString(36).slice(2,10);try{await api('reset',{user_id:u.uid,password:p})}catch(err){toast(err.message);return}infoDialog('Password reset',`New password for <b>${esc(u.id)}</b>: <code style="font-size:20px">${p}</code><br>Give it to the user. They can change it after login.`);return}
+  if(t.dataset.udel){if(!t.dataset.armed){t.dataset.armed=1;t.textContent='Tap again to remove';t.classList.remove('o');return}const u=S.users[+t.dataset.udel];try{await api('delete',{user_id:u.uid});await loadUsers();render(true);toast('User removed')}catch(err){toast(err.message)}return}
+  if(t.id==='tcopy'){const j=VIEW.tj??curJ();if(j>0){const m=DATA.months[j],src=S.targets[DATA.months[j-1]]||{};S.targets[m]=JSON.parse(JSON.stringify(src));const rows=Object.entries(S.targets[m]).map(([k,v])=>({month:m,scope_key:k,data:v}));if(rows.length){const{error}=await SB.from('targets').upsert(rows);if(error){toast(error.message);return}}render(true);toast('Copied')}return}
+  if(t.id==='upgo'){const f=$('#upf').files[0],log=$('#uplog'),m=$('#upm').value,cur=uploadMonths()[0];
+    if(!f){log.textContent='Pick the file first.';return}
+    if(typeof XLSX==='undefined'){log.textContent='Excel reader did not load. Check internet and reload.';return}
+    log.textContent=`Reading ${f.name} (${(f.size/1e6).toFixed(1)} MB) for ${mlab(m)}…\n`;await new Promise(r=>setTimeout(r,30));
+    try{const wb=XLSX.read(await f.arrayBuffer(),{type:'array',cellDates:true});const res=parseBook(wb,m);
+      if(!res.out.length){log.textContent+=`✗ This file has ${res.inFile.map(mlab).join(', ')||'no month columns'} — no ${mlab(m)} numbers. Choose the right month or file.`;return}
+      log.textContent+='Saving to server…\n';busy(true,'Saving '+mlab(m)+'…');await writeMonth(res,m,m===cur?$('#upasof').value:null);busy(false);
+      log.textContent+=`✓ ${mlab(m)} loaded from sheet "${res.sheet}": ${res.out.length} dealers, ${res.found.length}/${Object.keys(MAP).length} measures found.${res.inFile.length>1?` (Other months in file ignored: ${res.inFile.filter(x=>x!==m).map(mlab).join(', ')})`:''}\n`;
+      const keep=log.textContent;VIEW.upm=m;renderShell();$('#uplog').textContent=keep}
+    catch(err){busy(false);log.textContent+=`✗ ${err.message}\n`}return}
+});
+document.addEventListener('change',e=>{const t=e.target;
+  if(t.id==='ps'){VIEW.ps=t.value;render(true)} if(t.id==='pj'){VIEW.pj=+t.value;render(true)}
+  if(t.id==='os'){VIEW.os=t.value;render(true)} if(t.id==='ts'){VIEW.ts=t.value;render(true)} if(t.id==='tk'){VIEW.tk=t.value;render(true)}
+  if(t.id==='tj'){VIEW.tj=+t.value;render(true)} if(t.id==='tw'){VIEW.tw=t.value;render(true)}
+  if(t.id==='upm'){VIEW.upm=t.value;$('#upasofw').classList.toggle('hide',t.value!==uploadMonths()[0])}
+  if(t.dataset.tk){const p=t.dataset.tk.split('|'),k=p.pop(),key=p.join('|'),m=DATA.months[VIEW.tj??curJ()];S.targets[m]=S.targets[m]||{};S.targets[m][key]=S.targets[m][key]||{};
+    if(t.value.trim()==='')delete S.targets[m][key][k];else S.targets[m][key][k]=+t.value;saveTarget(m,key)}
+  if(t.dataset.rate){const p=t.dataset.rate.split('.');let o=S.rates;for(let i=0;i<p.length-1;i++)o=o[p[i]];o[p[p.length-1]]=+t.value||0;saveSetting('rates',S.rates).then(x=>x&&toast('Saved'))}
+  if(t.dataset.cc){const[ty,k]=t.dataset.cc.split(':'),C=CARDS();if(ty==='k'){if(t.checked)delete C.off[k];else C.off[k]=true}else C[k]=t.checked;saveSetting('cards',C);render(true)}
+  if(t.id==='logof'&&t.files[0]){const fr=new FileReader();fr.onload=()=>{const im=new Image();im.onload=()=>{const sc=Math.min(1,480/im.width,160/im.height),c=document.createElement('canvas');c.width=Math.round(im.width*sc);c.height=Math.round(im.height*sc);c.getContext('2d').drawImage(im,0,0,c.width,c.height);S.logo=c.toDataURL('image/png');saveSetting('logo',S.logo).then(x=>{renderShell();x&&toast('Logo saved')})};im.src=fr.result};fr.readAsDataURL(t.files[0])}
+  if(t.dataset.feat){S.features[t.dataset.feat]=t.checked;saveSetting('features',S.features).then(x=>{renderShell();x&&toast('Saved')})}
+  if(t.id==='fban'){S.banner=t.value;saveSetting('banner',S.banner).then(x=>x&&toast('Saved'))}
+});
+let qT;document.addEventListener('input',e=>{const id=e.target.id;if(!['oq','dq','tq','pq'].includes(id))return;clearTimeout(qT);
+  qT=setTimeout(()=>{VIEW[id==='oq'?'q':id]=e.target.value;const pos=e.target.selectionStart;render(true);const i=$('#'+id);if(i){i.focus();i.setSelectionRange(pos,pos)}},250)});
+document.addEventListener('submit',async e=>{
+  if(e.target.id==='uform'){e.preventDefault();const id=$('#nid').value.trim().toLowerCase();if(S.users.some(u=>u.id===id)){toast('User ID already exists');return}
+    try{busy(true,'Creating user…');await api('create',{login_id:id,name:$('#nname').value.trim(),email:$('#nmail').value.trim(),password:$('#npw').value,role:$('#nrole').value,scope:$('#nrole').value==='admin'?'ALL':$('#nscope').value});await loadUsers();busy(false);render(true);toast('User created')}catch(err){busy(false);toast(err.message)}}
+  if(e.target.id==='pwform'){e.preventDefault();if($('#pwn').value.length<6){$('#pwerr').textContent='Use at least 6 characters';return}
+    const chk=await SB.auth.signInWithPassword({email:`${USER.id}@${DOMAIN}`,password:$('#pwo').value});if(chk.error){$('#pwerr').textContent='Current password is wrong';return}
+    const{error}=await SB.auth.updateUser({password:$('#pwn').value});if(error){$('#pwerr').textContent=error.message;return}$('#modal').innerHTML='';toast('Password changed')}
+});
+function pwDialog(){$('#modal').innerHTML=`<div class="modal"><form class="sheet" id="pwform"><b style="font-size:17px">Change my password</b>
+  <label class="flab">Current password</label><input id="pwo" type="password" required>
+  <label class="flab">New password</label><input id="pwn" type="password" required>
+  <div class="err" id="pwerr"></div><div class="row"><button class="btn">Save</button><button type="button" class="btn o" id="mclose">Cancel</button></div></form></div>`}
+function infoDialog(h,b){$('#modal').innerHTML=`<div class="modal"><div class="sheet"><b style="font-size:17px">${h}</b><p>${b}</p><button class="btn" id="mclose">OK</button></div></div>`}
+
+async function enter(user){
+  const{data:me,error}=await SB.from('app_users').select('*').eq('id',user.id).maybeSingle();
+  if(error||!me){await SB.auth.signOut();throw new Error('This login has no access. Ask your admin.')}
+  USER={uid:me.id,id:me.login_id,name:me.name,email:me.email||'',role:me.role,scope:me.scope};
+  busy(true,'Loading your data…');try{await loadAll()}finally{busy(false)}
+  TAB=!DATA.months.length&&USER.role==='admin'?'admin':'perf';VIEW={};$('#login').classList.add('hide');$('#app').classList.remove('hide');renderShell()}
+$('#lform').addEventListener('submit',async e=>{e.preventDefault();$('#lerr').textContent='';
+  const id=$('#lid').value.trim().toLowerCase(),{data,error}=await SB.auth.signInWithPassword({email:`${id}@${DOMAIN}`,password:$('#lpw').value});
+  if(error){$('#lerr').textContent='Wrong user ID or password';return}
+  try{await enter(data.user)}catch(err){$('#lerr').textContent=err.message||String(err)}});
+$('#sform').addEventListener('submit',async e=>{e.preventDefault();$('#sferr').textContent='';const id=$('#sid').value.trim().toLowerCase();
+  try{busy(true,'Creating admin…');await api('bootstrap',{code:$('#scode').value,login_id:id,name:$('#sname').value.trim(),email:$('#semail').value.trim(),password:$('#spw').value});
+    const{data,error}=await SB.auth.signInWithPassword({email:`${id}@${DOMAIN}`,password:$('#spw').value});if(error)throw error;busy(false);$('#sform').classList.add('hide');$('#lform').classList.remove('hide');await enter(data.user)}
+  catch(err){busy(false);$('#sferr').textContent=err.message||String(err)}});
+(async()=>{
+  try{const{data}=await SB.from('settings').select('value').eq('key','logo').maybeSingle();S.logo=data?.value||null}catch(_){}
+  brand();
+  try{const st=await api('status');if(st.needsSetup){$('#lform').classList.add('hide');$('#sform').classList.remove('hide');return}}catch(_){}
+  const{data:{session}}=await SB.auth.getSession();
+  if(session)try{await enter(session.user)}catch(err){$('#lerr').textContent=err.message||String(err)}
+})();
+if('serviceWorker'in navigator&&location.protocol==='https:')navigator.serviceWorker.register('sw.js').catch(()=>{});
+}
+</script>
+</body>
+</html>
