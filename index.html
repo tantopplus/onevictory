@@ -804,7 +804,7 @@ function adminView(){
 
 /* --- xlsx upload parser: finds headers by name --- */
 const MAP={pre:'TOTAL PREPAID GA',mig:'MIGRANT GA',ms:'MSIAN GA',aw:'AWIU7 SUBS',mk:'MSIAN IU7>=RM30',lvp:'MSIAN IU7 <RM30',mvp:'MSIAN IU7 >=RM30-44',hvp:'MSIAN IU7 >=RM45-54',uhvp:'MSIAN IU7 >=RM55',gmvp:'MIGRANT IU7 >=RM30-44',ghvp:'MIGRANT IU7 >=RM45-54',guhvp:'MIGRANT IU7 >=RM55',post:'POSTPAID GA TTL',mpost:'MIGRANT POSTPAID GA',dev:'POSTPAID DEVICE GA',pmj:'DEVICE PMJ',si:'DEVICE SELL IN'};
-const ym=v=>{if(v instanceof Date)return ymOf(v);if(typeof v==='number'&&v>40000&&v<60000){const d=XLSX.SSF.parse_date_code(v);return d.y+'-'+String(d.m).padStart(2,'0')}return null};
+const ym=v=>{if(v instanceof Date){const d=new Date(v.getTime()+432e5);return d.getUTCFullYear()+'-'+String(d.getUTCMonth()+1).padStart(2,'0')}if(typeof v==='number'&&v>40000&&v<60000){const d=XLSX.SSF.parse_date_code(v);return d.y+'-'+String(d.m).padStart(2,'0')}return null};
 function parseBook(wb,want){
   for(const sn of wb.SheetNames){const rows=XLSX.utils.sheet_to_json(wb.Sheets[sn],{header:1,raw:true,defval:null});
     const hr=rows.slice(0,15).findIndex(r=>r&&r.some(x=>String(x??'').trim()==='DIGI DLR CODE'));if(hr<0)continue;
@@ -863,7 +863,7 @@ document.addEventListener('click',async e=>{
     if(!f){log.textContent='Pick the file first.';return}
     if(typeof XLSX==='undefined'){log.textContent='Excel reader did not load. Check internet and reload.';return}
     log.textContent=`Reading ${f.name} (${(f.size/1e6).toFixed(1)} MB) for ${mlab(m)}…\n`;await new Promise(r=>setTimeout(r,30));
-    try{const wb=XLSX.read(await f.arrayBuffer(),{type:'array',cellDates:true});const res=parseBook(wb,m);
+    try{const wb=XLSX.read(await f.arrayBuffer(),{type:'array'});const res=parseBook(wb,m);
       if(!res.out.length){log.textContent+=`✗ This file has ${res.inFile.map(mlab).join(', ')||'no month columns'} — no ${mlab(m)} numbers. Choose the right month or file.`;return}
       log.textContent+='Saving to server…\n';busy(true,'Saving '+mlab(m)+'…');await writeMonth(res,m,m===cur?$('#upasof').value:null);busy(false);
       log.textContent+=`✓ ${mlab(m)} loaded from sheet "${res.sheet}": ${res.out.length} dealers, ${res.found.length}/${Object.keys(MAP).length} measures found.${res.inFile.length>1?` (Other months in file ignored: ${res.inFile.filter(x=>x!==m).map(mlab).join(', ')})`:''}\n`;
