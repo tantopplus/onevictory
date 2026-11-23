@@ -277,7 +277,8 @@ const planHtml=k=>`<span class="plan"><b>${PLAN[k][0]}</b><small>(${PLAN[k][1]})
 
 /* ---------- server (Supabase) ---------- */
 const SB_URL='https://zbqajfwmlihgncrlmeek.supabase.co',SB_KEY='sb_publishable_YcnMI2OvEzvO1dtijQLHpw_zqj5C5oI',DOMAIN='users.onevictory.app';
-const SB=window.supabase.createClient(SB_URL,SB_KEY,{auth:{persistSession:true,autoRefreshToken:true}});
+const SB=window.supabase.createClient(SB_URL,SB_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:false,lock:async(_n,_t,fn)=>await fn()}});
+const withTimeout=(p,ms,msg)=>Promise.race([p,new Promise((_,rej)=>setTimeout(()=>rej(new Error(msg)),ms))]);
 const DEF_KEYS=['pre','mig','ms','aw','mk','lvp','mvp','hvp','uhvp','gmvp','ghvp','guhvp','post','mpost','dev','pmj','si'];
 S={users:[],targets:{},rates:JSON.parse(JSON.stringify(DEF_RATES)),features:{...DEF_FEAT},banner:'',cards:null,logo:null};
 DATA={asOf:todayKL(),months:[],keys:DEF_KEYS,dealers:[]};
@@ -300,7 +301,7 @@ async function loadAll(){
   const om=new Map((await fetchAll(()=>SB.from('profile_owner').select('id,n,ic,brn,tin').order('id'))).map(o=>[o.id,o]));
   PROF={asOf:st.profAsOf||'',dealers:pr.map(p=>({...p,xd:p.xd||[],ow:om.get(p.id)||null})).sort((a,b)=>a.n.localeCompare(b.n))};
   await loadUsers()}
-async function saveSetting(k,v){const{error}=await SB.from('settings').upsert({key:k,value:v,updated_at:new Date().toISOString()});if(error){toast('Not saved: '+error.message);return false}return true}
+async function saveSetting(k,v){const row={key:k,value:v,updated_at:new Date().toISOString()};const{error}=await SB.from('settings').upsert(row);if(error){toast('Not saved: '+error.message);return false}return true}
 async function saveTarget(m,key){const{error}=await SB.from('targets').upsert({month:m,scope_key:key,data:(S.targets[m]||{})[key]||{}});if(error)toast('Not saved: '+error.message)}
 async function api(action,body={}){const{data:{session}}=await SB.auth.getSession();const h={'Content-Type':'application/json',apikey:SB_KEY};if(session)h.Authorization='Bearer '+session.access_token;
   const r=await fetch(SB_URL+'/functions/v1/admin-users',{method:'POST',headers:h,body:JSON.stringify({action,...body})});const j=await r.json().catch(()=>({error:'Server error '+r.status}));if(!r.ok||j.error)throw new Error(j.error||'Server error');return j}
@@ -853,7 +854,7 @@ document.addEventListener('click',async e=>{
   if(t.dataset.td){VIEW.td=t.dataset.td;VIEW.tq='';render(true);return}
   if(t.dataset.tm2){VIEW.tmode2=t.dataset.tm2;render(true);return}
   if(t.id==='tsave'){document.querySelectorAll('.tform input').forEach(i=>i.dispatchEvent(new Event('change',{bubbles:true})));toast('Targets saved');return}
-  if(t.id==='bout'){await SB.auth.signOut();USER=null;$('#app').classList.add('hide');$('#login').classList.remove('hide');$('#lpw').value='';return}
+  if(t.id==='bout'){busy(true,'Logging out…');try{await withTimeout(SB.auth.signOut({scope:'local'}),8000,'timeout')}catch(_){}try{Object.keys(localStorage).filter(k=>k.startsWith('sb-')).forEach(k=>localStorage.removeItem(k))}catch(_){}location.reload();return}
   if(t.id==='bpw'){pwDialog();return}
   if(t.dataset.ureset){const u=S.users[+t.dataset.ureset],p=Math.random().toString(36).slice(2,10);try{await api('reset',{user_id:u.uid,password:p})}catch(err){toast(err.message);return}infoDialog('Password reset',`New password for <b>${esc(u.id)}</b>: <code style="font-size:20px">${p}</code><br>Give it to the user. They can change it after login.`);return}
   if(t.dataset.udel){if(!t.dataset.armed){t.dataset.armed=1;t.textContent='Tap again to remove';t.classList.remove('o');return}const u=S.users[+t.dataset.udel];try{await api('delete',{user_id:u.uid});await loadUsers();render(true);toast('User removed')}catch(err){toast(err.message)}return}
@@ -898,15 +899,18 @@ function pwDialog(){$('#modal').innerHTML=`<div class="modal"><form class="sheet
 function infoDialog(h,b){$('#modal').innerHTML=`<div class="modal"><div class="sheet"><b style="font-size:17px">${h}</b><p>${b}</p><button class="btn" id="mclose">OK</button></div></div>`}
 
 async function enter(user){
-  const{data:me,error}=await SB.from('app_users').select('*').eq('id',user.id).maybeSingle();
+  const{data:me,error}=await withTimeout(SB.from('app_users').select('*').eq('id',user.id).maybeSingle(),20000,'No reply from server. Check internet and try again.');
   if(error||!me){await SB.auth.signOut();throw new Error('This login has no access. Ask your admin.')}
   USER={uid:me.id,id:me.login_id,name:me.name,email:me.email||'',role:me.role,scope:me.scope};
   busy(true,'Loading your data…');try{await loadAll()}finally{busy(false)}
   TAB=!DATA.months.length&&USER.role==='admin'?'admin':'perf';VIEW={};$('#login').classList.add('hide');$('#app').classList.remove('hide');renderShell()}
-$('#lform').addEventListener('submit',async e=>{e.preventDefault();$('#lerr').textContent='';
-  const id=$('#lid').value.trim().toLowerCase(),{data,error}=await SB.auth.signInWithPassword({email:`${id}@${DOMAIN}`,password:$('#lpw').value});
-  if(error){$('#lerr').textContent='Wrong user ID or password';return}
-  try{await enter(data.user)}catch(err){$('#lerr').textContent=err.message||String(err)}});
+$('#lform').addEventListener('submit',async e=>{e.preventDefault();$('#lerr').textContent='';const btn=$('#lform button');if(btn.disabled)return;btn.disabled=true;
+  const id=$('#lid').value.trim().toLowerCase();busy(true,'Logging in…');
+  try{const{data,error}=await withTimeout(SB.auth.signInWithPassword({email:`${id}@${DOMAIN}`,password:$('#lpw').value}),20000,'No reply from server. Check internet and try again.');
+    if(error){busy(false);$('#lerr').textContent='Wrong user ID or password';return}
+    await withTimeout(enter(data.user),60000,'Loading took too long. Check internet and try again.')}
+  catch(err){busy(false);$('#lerr').textContent=err.message||String(err)}
+  finally{btn.disabled=false}});
 $('#sform').addEventListener('submit',async e=>{e.preventDefault();$('#sferr').textContent='';const id=$('#sid').value.trim().toLowerCase();
   try{busy(true,'Creating admin…');await api('bootstrap',{code:$('#scode').value,login_id:id,name:$('#sname').value.trim(),email:$('#semail').value.trim(),password:$('#spw').value});
     const{data,error}=await SB.auth.signInWithPassword({email:`${id}@${DOMAIN}`,password:$('#spw').value});if(error)throw error;busy(false);$('#sform').classList.add('hide');$('#lform').classList.remove('hide');await enter(data.user)}
@@ -915,8 +919,8 @@ $('#sform').addEventListener('submit',async e=>{e.preventDefault();$('#sferr').t
   try{const{data}=await SB.from('settings').select('value').eq('key','logo').maybeSingle();S.logo=data?.value||null}catch(_){}
   brand();
   try{const st=await api('status');if(st.needsSetup){$('#lform').classList.add('hide');$('#sform').classList.remove('hide');return}}catch(_){}
-  const{data:{session}}=await SB.auth.getSession();
-  if(session)try{await enter(session.user)}catch(err){$('#lerr').textContent=err.message||String(err)}
+  let session=null;try{session=(await withTimeout(SB.auth.getSession(),8000,'t')).data.session}catch(_){}
+  if(session)try{await withTimeout(enter(session.user),60000,'Loading took too long. Please log in again.')}catch(err){busy(false);$('#lerr').textContent=err.message||String(err)}
 })();
 if('serviceWorker'in navigator&&location.protocol==='https:')navigator.serviceWorker.register('sw.js').catch(()=>{});
 }
